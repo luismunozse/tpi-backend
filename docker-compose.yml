@@ -1,0 +1,129 @@
+version: '3.8'
+
+services:
+    keycloak:
+        image: quay.io/keycloak/keycloak:24.0.3
+        container_name: keycloak
+        command: start-dev
+        ports: 
+            - 9090:8080
+        environment:
+            - KEYCLOAK_ADMIN=admin
+            - KEYCLOAK_ADMIN_PASSWORD=admin123
+        volumes:
+            - keycloak_data:/opt/keycloak/data
+        networks:
+            - tpibackend
+
+    transportes-db:
+        image: postgres:15
+        container_name: transportes-db
+        environment:
+            - POSTGRES_DB=transportes_db
+            - POSTGRES_USER=transportes_user
+            - POSTGRES_PASSWORD=transportes_password
+        volumes:
+            - transportes_data:/var/lib/postgresql/data
+        networks:
+            - tpibackend
+        
+    flota-db:
+        image: postgres:15
+        container_name: flota-db
+        environment:
+            - POSTGRES_DB=flota_db
+            - POSTGRES_USER=flota_user
+            - POSTGRES_PASSWORD=flota_password
+        volumes:
+            - flota_data:/var/lib/postgresql/data
+        networks:
+            - tpibackend
+
+    costos-db:
+        image: postgres:15
+        container_name: costos-db
+        environment:
+            - POSTGRES_DB=costos_db
+            - POSTGRES_USER=costos_user
+            - POSTGRES_PASSWORD=costos_password
+        volumes:
+            - costos_data:/var/lib/postgresql/data
+        networks:
+            - tpibackend
+
+    transportes-service:
+        build:
+            context: ./transportes-service
+            dockerfile: Dockerfile
+        container_name: transportes-service
+        environment:
+            - SPRING_DATASOURCE_URL=jdbc:postgresql://transportes-db:5432/transportes_db
+            - SPRING_DATASOURCE_USERNAME=transportes_user
+            - SPRING_DATASOURCE_PASSWORD=transportes_password
+            - SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI=http://keycloak:8080/realms/tpi-backend
+        depends_on:
+            - transportes-db
+            - keycloak
+        networks:
+            - tpibackend
+    
+    flota-service:
+        build:
+            context: ./flota-service
+            dockerfile: Dockerfile
+        container_name: flota-service
+        environment:
+            - SPRING_DATASOURCE_URL=jdbc:postgresql://flota-db:5432/flota_db
+            - SPRING_DATASOURCE_USERNAME=flota_user
+            - SPRING_DATASOURCE_PASSWORD=flota_password
+            - SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI=http://keycloak:8080/realms/tpi-backend
+        depends_on:
+            - flota-db
+            - keycloak
+        networks:
+            - tpibackend
+
+    costos-service:
+        build:
+            context: ./costos-service
+            dockerfile: Dockerfile
+        container_name: costos-service
+        environment:
+            - SPRING_DATASOURCE_URL=jdbc:postgresql://costos-db:5432/costos_db
+            - SPRING_DATASOURCE_USERNAME=costos_user
+            - SPRING_DATASOURCE_PASSWORD=costos_password
+            - SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI=http://keycloak:8080/realms/tpi-backend
+            - GOOGLE_MAPS_API_KEY=${GOOGLE_MAPS_API_KEY}
+        depends_on:
+            - costos-db
+            - keycloak
+        networks:
+            - tpibackend
+
+    api-gateway:
+        build:
+            context: ./api-gateway
+            dockerfile: Dockerfile
+        container_name: api-gateway
+        ports:
+            - 8080:8080
+        environment:
+            - SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI=http://keycloak:8080/realms/tpi-backend
+            - SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_KEYCLOAK_CLIENT_ID=api-gateway
+            - SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_KEYCLOAK_CLIENT_SECRET=gateway-secret
+        depends_on:
+            - transportes-service
+            - flota-service
+            - costos-service
+            - keycloak
+        networks:
+            - tpibackend
+
+networks:
+    tpibackend:
+
+volumes:
+    keycloak_data:
+    transportes_data:
+    flota_data:
+    costos_data:

@@ -1,0 +1,41 @@
+server:
+  port: 8081
+spring:
+  application:
+    name: transportes-service
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/transportes_db
+    username: transportes_user
+    password: transportes_pass
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    open-in-view: false
+
+  jackson:
+    serialization:
+      fail-on-empty-beans: false #Configuración para evitar errores con entidades JPA vacias
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8080/realms/tpi-backend #URL del servidor de autorización
+
+logging:
+  level:
+    root: INFO #Nivel de log global
+    ar.edu.utn.frc.backend.tpi.transportes: DEBUG #Nivel de log específico para el paquete del servicio de transportes
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics #Exponer endpoints de salud, info y métricas
+  endpoint:
+    health:
+      show-details: always #Mostrar detalles de salud siempre

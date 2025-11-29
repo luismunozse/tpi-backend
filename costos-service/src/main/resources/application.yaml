@@ -1,0 +1,41 @@
+server:
+  port: 8083
+spring:
+  application:
+    name: costos
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/costos_db
+    username: costos_user
+    password: costos_pass
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    open-in-view: false
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8080/realms/tpi-backend
+
+google:
+  maps:
+    api-key: ${GOOGLE_MAPS_API_KEY}
+
+logging:
+  level:
+    root: INFO
+    ar.edu.utn.frc.backend.tpi.costos: DEBUG
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: always
