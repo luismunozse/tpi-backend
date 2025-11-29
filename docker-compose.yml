@@ -15,15 +15,15 @@ services:
         networks:
             - tpibackend
 
-    transportes-db:
+    solicitudes-db:
         image: postgres:15
-        container_name: transportes-db
+        container_name: solicitudes-db
         environment:
-            - POSTGRES_DB=transportes_db
-            - POSTGRES_USER=transportes_user
-            - POSTGRES_PASSWORD=transportes_password
+            - POSTGRES_DB=solicitudes_db
+            - POSTGRES_USER=solicitudes_user
+            - POSTGRES_PASSWORD=solicitudes_password
         volumes:
-            - transportes_data:/var/lib/postgresql/data
+            - solicitudes_data:/var/lib/postgresql/data
         networks:
             - tpibackend
         
@@ -51,18 +51,18 @@ services:
         networks:
             - tpibackend
 
-    transportes-service:
+    solicitudes-service:
         build:
-            context: ./transportes-service
+            context: ./solicitudes-service
             dockerfile: Dockerfile
-        container_name: transportes-service
+        container_name: solicitudes-service
         environment:
-            - SPRING_DATASOURCE_URL=jdbc:postgresql://transportes-db:5432/transportes_db
-            - SPRING_DATASOURCE_USERNAME=transportes_user
-            - SPRING_DATASOURCE_PASSWORD=transportes_password
+            - SPRING_DATASOURCE_URL=jdbc:postgresql://solicitudes-db:5432/solicitudes_db
+            - SPRING_DATASOURCE_USERNAME=solicitudes_user
+            - SPRING_DATASOURCE_PASSWORD=solicitudes_password
             - SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI=http://keycloak:8080/realms/tpi-backend
         depends_on:
-            - transportes-db
+            - solicitudes-db
             - keycloak
         networks:
             - tpibackend
@@ -112,7 +112,7 @@ services:
             - SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_KEYCLOAK_CLIENT_ID=api-gateway
             - SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_KEYCLOAK_CLIENT_SECRET=gateway-secret
         depends_on:
-            - transportes-service
+            - solicitudes-service
             - flota-service
             - costos-service
             - keycloak
@@ -124,6 +124,6 @@ networks:
 
 volumes:
     keycloak_data:
-    transportes_data:
+    solicitudes_data:
     flota_data:
     costos_data:
