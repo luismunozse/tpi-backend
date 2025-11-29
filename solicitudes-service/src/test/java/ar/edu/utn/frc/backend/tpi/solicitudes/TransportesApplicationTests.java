@@ -1,10 +1,10 @@
-package ar.edu.utn.frc.backend.tpi.transportes;
+package ar.edu.utn.frc.backend.tpi.solicitudes;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class TransportesApplicationTests {
+class SolicitudesApplicationTests {
 
 	@Test
 	void contextLoads() {
