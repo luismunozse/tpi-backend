@@ -5,6 +5,9 @@ import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,6 +20,7 @@ import ar.edu.utn.frc.backend.tpi.solicitudes.entity.EstadoTramo;
 import ar.edu.utn.frc.backend.tpi.solicitudes.entity.Ruta;
 import ar.edu.utn.frc.backend.tpi.solicitudes.entity.Solicitud;
 import ar.edu.utn.frc.backend.tpi.solicitudes.entity.Tramo;
+import ar.edu.utn.frc.backend.tpi.solicitudes.mapper.SolicitudMapper;
 import ar.edu.utn.frc.backend.tpi.solicitudes.repository.ClienteRepository;
 import ar.edu.utn.frc.backend.tpi.solicitudes.repository.ContenedorRepository;
 import ar.edu.utn.frc.backend.tpi.solicitudes.repository.RutaRepository;
@@ -51,7 +55,7 @@ public class SolicitudService {
     /**
      * CU-01: Registrar solicitud de transporte.
      * Crea una nueva solicitud asociada a un cliente y contenedor existentes.
-     * La solicitud se crea en estado PENDIENTE.
+     * La solicitud se crea en estado BORRADOR.
      *
      * @param solicitudRequest datos de la solicitud
      * @return SolicitudResponse con los datos de la solicitud creada
@@ -82,7 +86,7 @@ public class SolicitudService {
                 .destinoDireccion(solicitudRequest.getDestinoDireccion())
                 .destinoLatitud(solicitudRequest.getDestinoLatitud())
                 .destinoLongitud(solicitudRequest.getDestinoLongitud())
-                .estado(EstadoSolicitud.PENDIENTE)
+                .estado(EstadoSolicitud.BORRADOR)
                 .fechaCreacion(LocalDateTime.now())
                 .build();
 
@@ -108,6 +112,9 @@ public class SolicitudService {
                 .orElseThrow(() -> new IllegalArgumentException(
                         "Solicitud no encontrada con id: " + id));
 
+        Jwt jwt = getJwt();
+        validarPropietario(solicitud.getCliente(), jwt);
+
         return mapToResponse(solicitud);
     }
 
@@ -117,7 +124,7 @@ public class SolicitudService {
      * @param clienteId identificador del cliente
      * @return lista de solicitudes del cliente
      */
-    @Transactional(readOnly = true)
+    @Transactional(readOnly = true) // Solo lectura de datos 
     public List<SolicitudResponse> obtenerSolicitudesPorCliente(Long clienteId) {
         log.info("Consultando solicitudes del cliente: {}", clienteId);
 
@@ -126,9 +133,11 @@ public class SolicitudService {
             throw new IllegalArgumentException("Cliente no encontrado con id: " + clienteId);
         }
 
-        List<Solicitud> solicitudes = solicitudRepository.findAll().stream()
-                .filter(s -> s.getCliente().getId().equals(clienteId))
-                .collect(Collectors.toList());
+        // Si es rol CLIENTE, solo puede consultar su propio clienteId
+        Jwt jwt = getJwt();
+        validarClienteId(jwt, clienteId);
+
+        List<Solicitud> solicitudes = solicitudRepository.findByClienteId(clienteId);
 
         return solicitudes.stream()
                 .map(this::mapToResponse)
@@ -137,7 +146,7 @@ public class SolicitudService {
 
     /**
      * CU-05: Consultar contenedores pendientes.
-     * Retorna todas las solicitudes que no están en estado FINALIZADA.
+     * Retorna todas las solicitudes que no están en estado ENTREGADA.
      *
      * @return lista de solicitudes pendientes
      */
@@ -145,9 +154,7 @@ public class SolicitudService {
     public List<SolicitudResponse> obtenerSolicitudesPendientes() {
         log.info("Consultando solicitudes pendientes");
 
-        List<Solicitud> solicitudes = solicitudRepository.findAll().stream()
-                .filter(s -> !EstadoSolicitud.FINALIZADA.equals(s.getEstado()))
-                .collect(Collectors.toList());
+        List<Solicitud> solicitudes = solicitudRepository.findByEstadoNot(EstadoSolicitud.ENTREGADA);
 
         return solicitudes.stream()
                 .map(this::mapToResponse)
@@ -164,9 +171,7 @@ public class SolicitudService {
     public List<SolicitudResponse> obtenerSolicitudesPorEstado(EstadoSolicitud estado) {
         log.info("Consultando solicitudes con estado: {}", estado);
 
-        List<Solicitud> solicitudes = solicitudRepository.findAll().stream()
-                .filter(s -> estado.equals(s.getEstado()))
-                .collect(Collectors.toList());
+        List<Solicitud> solicitudes = solicitudRepository.findByEstado(estado);
 
         return solicitudes.stream()
                 .map(this::mapToResponse)
@@ -182,7 +187,7 @@ public class SolicitudService {
      * @param rutaId identificador de la ruta
      * @return SolicitudResponse actualizada
      * @throws IllegalArgumentException si la solicitud o ruta no existen
-     * @throws IllegalStateException si la solicitud no está en estado PENDIENTE
+     * @throws IllegalStateException si la solicitud no está en estado BORRADOR
      */
     @Transactional
     public SolicitudResponse asignarRuta(Long solicitudId, Long rutaId) {
@@ -196,10 +201,10 @@ public class SolicitudService {
                 .orElseThrow(() -> new IllegalArgumentException(
                         "Ruta no encontrada con id: " + rutaId));
 
-        // Validar que la solicitud está en estado PENDIENTE
-        if (!EstadoSolicitud.PENDIENTE.equals(solicitud.getEstado())) {
+        // Validar que la solicitud está en estado BORRADOR
+        if (!EstadoSolicitud.BORRADOR.equals(solicitud.getEstado())) {
             throw new IllegalStateException(
-                    "Solo se puede asignar ruta a solicitudes en estado PENDIENTE. Estado actual: "
+                    "Solo se puede asignar ruta a solicitudes en estado BORRADOR. Estado actual: "
                     + solicitud.getEstado());
         }
 
@@ -340,7 +345,7 @@ public class SolicitudService {
         // Actualizar solicitud
         solicitud.setCostoFinal(costoReal);
         solicitud.setTiempoRealHoras(tiempoRealHoras);
-        solicitud.setEstado(EstadoSolicitud.FINALIZADA);
+        solicitud.setEstado(EstadoSolicitud.ENTREGADA);
 
         solicitudRepository.save(solicitud);
         log.info("Solicitud {} finalizada. Costo real: {}, Tiempo real: {} horas",
@@ -415,6 +420,72 @@ public class SolicitudService {
      * @return SolicitudResponse
      */
     private SolicitudResponse mapToResponse(Solicitud solicitud) {
-        return ar.edu.utn.frc.backend.tpi.solicitudes.mapper.SolicitudMapper.toResponse(solicitud);
+        return SolicitudMapper.toResponse(solicitud);
     }
+
+    /**
+     * Valida que, si el rol es CLIENTE, el recurso pertenece al subject autenticado.
+     * Se asume que el claim "email" o "preferred_username" se corresponde con el email del cliente.
+     */
+    private void validarPropietario(Cliente cliente, Jwt jwt) {
+        if (cliente == null || jwt == null) {
+            return;
+        }
+        if (tieneRol("ADMIN") || tieneRol("TRANSPORTISTA")) {
+            return;
+        }
+        if (tieneRol("CLIENTE")) {
+            String emailToken = obtenerEmail(jwt);
+            if (emailToken == null || !emailToken.equalsIgnoreCase(cliente.getEmail())) {
+                throw new org.springframework.security.access.AccessDeniedException(
+                        "No puedes acceder a una solicitud de otro cliente");
+            }
+        }
+    }
+
+    private void validarClienteId(Jwt jwt, Long clienteId) {
+        if (jwt == null || clienteId == null) {
+            return;
+        }
+        if (tieneRol("ADMIN")) {
+            return;
+        }
+        if (tieneRol("CLIENTE")) {
+            String emailToken = obtenerEmail(jwt);
+            if (emailToken == null) {
+                throw new org.springframework.security.access.AccessDeniedException("Token sin email");
+            }
+            Cliente cliente = clienteRepository.findById(clienteId)
+                    .orElseThrow(() -> new IllegalArgumentException("Cliente no encontrado con id: " + clienteId));
+            if (!emailToken.equalsIgnoreCase(cliente.getEmail())) {
+                throw new org.springframework.security.access.AccessDeniedException(
+                        "No puedes acceder a otro cliente");
+            }
+        }
+    }
+
+    private boolean tieneRol(String rol) {
+        var auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null || auth.getAuthorities() == null) {
+            return false;
+        }
+        return auth.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_" + rol));
+    }
+
+    private Jwt getJwt() {
+        var auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth instanceof JwtAuthenticationToken token) {
+            return token.getToken();
+        }
+        return null;
+    }
+
+    private String obtenerEmail(Jwt jwt) {
+        String email = jwt.getClaimAsString("email");
+        if (email != null) {
+            return email;
+        }
+        return jwt.getClaimAsString("preferred_username");
+     }
 }

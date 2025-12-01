@@ -34,7 +34,6 @@ import lombok.extern.slf4j.Slf4j;
  *
  * Roles:
  * - ADMIN: Acceso completo a todas las operaciones
- * - OPERADOR: Puede consultar y crear clientes
  * - CLIENTE: Puede consultar sus propios datos
  */
 @RestController
@@ -54,7 +53,7 @@ public class ClienteController {
      * @return cliente creado con estado 201
      */
     @PostMapping
-    @PreAuthorize("hasAnyRole('CLIENTE', 'ADMIN', 'OPERADOR')")
+    @PreAuthorize("hasAnyRole('CLIENTE', 'ADMIN')")
     @Operation(summary = "Crear cliente", description = "Registra un nuevo cliente en el sistema")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Cliente creado exitosamente",
@@ -79,7 +78,7 @@ public class ClienteController {
      * @return cliente encontrado
      */
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'OPERADOR', 'CLIENTE')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'CLIENTE')")
     @Operation(summary = "Obtener cliente por ID", description = "Consulta los datos de un cliente específico")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Cliente encontrado",
@@ -105,7 +104,7 @@ public class ClienteController {
      * @return cliente encontrado
      */
     @GetMapping("/email/{email}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'OPERADOR', 'CLIENTE')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'CLIENTE')")
     @Operation(summary = "Obtener cliente por email", description = "Busca un cliente por su dirección de email")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Cliente encontrado",
@@ -128,7 +127,7 @@ public class ClienteController {
      * @return lista de todos los clientes
      */
     @GetMapping
-    @PreAuthorize("hasAnyRole('ADMIN', 'OPERADOR')")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Listar clientes", description = "Obtiene la lista completa de clientes registrados")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Lista de clientes",
@@ -151,7 +150,7 @@ public class ClienteController {
      * @return lista de clientes que coinciden
      */
     @GetMapping("/buscar")
-    @PreAuthorize("hasAnyRole('ADMIN', 'OPERADOR')")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Buscar clientes por nombre", description = "Búsqueda parcial de clientes por nombre")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Resultados de búsqueda",
@@ -174,7 +173,7 @@ public class ClienteController {
      * @return cliente actualizado
      */
     @PutMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'OPERADOR', 'CLIENTE')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'CLIENTE')")
     @Operation(summary = "Actualizar cliente", description = "Modifica los datos de un cliente existente")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Cliente actualizado exitosamente",
@@ -234,7 +233,7 @@ public class ClienteController {
      * @return cliente existente o recién creado
      */
     @PostMapping("/obtener-o-crear")
-    @PreAuthorize("hasAnyRole('CLIENTE', 'ADMIN', 'OPERADOR')")
+    @PreAuthorize("hasAnyRole('CLIENTE', 'ADMIN')")
     @Operation(summary = "Obtener o crear cliente", description = "Retorna el cliente si existe, o lo crea si no existe")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Cliente existente retornado",

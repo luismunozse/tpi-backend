@@ -42,7 +42,7 @@ public class SolicitudMapper {
                 .destinoDireccion(request.getDestinoDireccion())
                 .destinoLatitud(request.getDestinoLatitud())
                 .destinoLongitud(request.getDestinoLongitud())
-                .estado(EstadoSolicitud.PENDIENTE)
+                .estado(EstadoSolicitud.BORRADOR)
                 .fechaCreacion(LocalDateTime.now())
                 .build();
     }

@@ -33,15 +33,10 @@ import lombok.extern.slf4j.Slf4j;
 
 /**
  * Controlador REST para gestión de solicitudes de transporte.
- * Expone endpoints para crear, consultar y gestionar solicitudes.
- *
- * Casos de uso implementados:
- * - CU-01: Registrar solicitud de transporte (Cliente)
- * - CU-02: Consultar estado de transporte (Cliente)
- * - CU-04: Asignar ruta a solicitud (Operador/Administrador)
- * - CU-05: Consultar contenedores pendientes (Operador/Administrador)
- * - CU-07: Registrar inicio de tramo (Transportista)
- * - CU-08: Registrar fin de tramo (Transportista)
+ * Roles:
+ * - CLIENTE: crea solicitudes y consulta solo las propias.
+ * - ADMIN: gestión completa y consultas globales.
+ * - TRANSPORTISTA: seguimiento de tramos asignados (inicio/fin).
  */
 @RestController
 @RequestMapping("/api/solicitudes")
@@ -54,15 +49,8 @@ public class SolicitudController {
 
     private final SolicitudService solicitudService;
 
-    /**
-     * CU-01: Crear una nueva solicitud de transporte.
-     * Disponible para clientes.
-     *
-     * @param request datos de la solicitud
-     * @return solicitud creada
-     */
     @PostMapping
-    @PreAuthorize("hasAnyRole('CLIENTE', 'ADMIN', 'OPERADOR')")
+    @PreAuthorize("hasAnyRole('CLIENTE', 'ADMIN')")
     @Operation(summary = "Crear solicitud de transporte",
                description = "Registra una nueva solicitud de transporte de contenedor (CU-01)")
     @ApiResponses(value = {
@@ -84,13 +72,10 @@ public class SolicitudController {
 
     /**
      * CU-02: Obtener una solicitud por ID.
-     * Disponible para clientes (solo sus solicitudes), operadores y transportistas.
-     *
-     * @param id identificador de la solicitud
-     * @return solicitud encontrada
+     * Roles: CLIENTE (solo sus solicitudes), ADMIN (todas), TRANSPORTISTA (seguimiento).
      */
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyRole('CLIENTE', 'ADMIN', 'OPERADOR', 'TRANSPORTISTA')")
+    @PreAuthorize("hasAnyRole('CLIENTE', 'ADMIN', 'TRANSPORTISTA')")
     @Operation(summary = "Consultar solicitud por ID",
                description = "Obtiene el detalle completo de una solicitud de transporte (CU-02)")
     @ApiResponses(value = {
@@ -109,13 +94,10 @@ public class SolicitudController {
 
     /**
      * CU-02: Obtener solicitudes de un cliente.
-     * Disponible para clientes (solo sus propias solicitudes) y operadores.
-     *
-     * @param clienteId identificador del cliente
-     * @return lista de solicitudes del cliente
+     * Roles: CLIENTE (solo su propio clienteId), ADMIN (cualquier cliente).
      */
     @GetMapping("/cliente/{clienteId}")
-    @PreAuthorize("hasAnyRole('CLIENTE', 'ADMIN', 'OPERADOR')")
+    @PreAuthorize("hasAnyRole('CLIENTE', 'ADMIN')")
     @Operation(summary = "Consultar solicitudes de un cliente",
                description = "Obtiene todas las solicitudes de un cliente específico")
     @ApiResponses(value = {
@@ -131,16 +113,10 @@ public class SolicitudController {
         return ResponseEntity.ok(response);
     }
 
-    /**
-     * CU-05: Obtener solicitudes pendientes.
-     * Disponible solo para operadores y administradores.
-     *
-     * @return lista de solicitudes pendientes
-     */
     @GetMapping("/pendientes")
-    @PreAuthorize("hasAnyRole('ADMIN', 'OPERADOR')")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Consultar solicitudes pendientes",
-               description = "Obtiene todas las solicitudes que no están finalizadas (CU-05)")
+               description = "Obtiene todas las solicitudes que no están entregadas (CU-05)")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Solicitudes pendientes obtenidas"),
         @ApiResponse(responseCode = "401", description = "No autorizado")
@@ -151,15 +127,8 @@ public class SolicitudController {
         return ResponseEntity.ok(response);
     }
 
-    /**
-     * CU-05: Obtener solicitudes por estado.
-     * Disponible para operadores y administradores.
-     *
-     * @param estado estado de las solicitudes
-     * @return lista de solicitudes con el estado especificado
-     */
     @GetMapping("/por-estado")
-    @PreAuthorize("hasAnyRole('ADMIN', 'OPERADOR')")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Consultar solicitudes por estado",
                description = "Filtra solicitudes por su estado actual")
     @ApiResponses(value = {
@@ -176,14 +145,8 @@ public class SolicitudController {
         return ResponseEntity.ok(response);
     }
 
-    /**
-     * Obtener todas las solicitudes del sistema.
-     * Disponible solo para administradores y operadores.
-     *
-     * @return lista de todas las solicitudes
-     */
     @GetMapping
-    @PreAuthorize("hasAnyRole('ADMIN', 'OPERADOR')")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Listar todas las solicitudes",
                description = "Obtiene todas las solicitudes del sistema")
     @ApiResponses(value = {
@@ -196,16 +159,8 @@ public class SolicitudController {
         return ResponseEntity.ok(response);
     }
 
-    /**
-     * CU-04: Asignar ruta a una solicitud.
-     * Disponible solo para operadores y administradores.
-     *
-     * @param solicitudId identificador de la solicitud
-     * @param rutaId identificador de la ruta
-     * @return solicitud actualizada con la ruta asignada
-     */
     @PutMapping("/{solicitudId}/ruta/{rutaId}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'OPERADOR')")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Asignar ruta a solicitud",
                description = "Asocia una ruta planificada a una solicitud (CU-04)")
     @ApiResponses(value = {
@@ -224,15 +179,8 @@ public class SolicitudController {
         return ResponseEntity.ok(response);
     }
 
-    /**
-     * CU-07: Registrar inicio de tramo.
-     * Disponible para transportistas.
-     *
-     * @param tramoId identificador del tramo
-     * @return solicitud actualizada
-     */
     @PostMapping("/tramos/{tramoId}/inicio")
-    @PreAuthorize("hasAnyRole('TRANSPORTISTA', 'ADMIN', 'OPERADOR')")
+    @PreAuthorize("hasAnyRole('TRANSPORTISTA', 'ADMIN')")
     @Operation(summary = "Registrar inicio de tramo",
                description = "Marca el inicio de un tramo de transporte (CU-07)")
     @ApiResponses(value = {
@@ -250,15 +198,8 @@ public class SolicitudController {
         return ResponseEntity.ok(response);
     }
 
-    /**
-     * CU-08: Registrar fin de tramo.
-     * Disponible para transportistas.
-     *
-     * @param tramoId identificador del tramo
-     * @return solicitud actualizada
-     */
     @PostMapping("/tramos/{tramoId}/fin")
-    @PreAuthorize("hasAnyRole('TRANSPORTISTA', 'ADMIN', 'OPERADOR')")
+    @PreAuthorize("hasAnyRole('TRANSPORTISTA', 'ADMIN')")
     @Operation(summary = "Registrar fin de tramo",
                description = "Marca el fin de un tramo de transporte (CU-08)")
     @ApiResponses(value = {
@@ -276,16 +217,8 @@ public class SolicitudController {
         return ResponseEntity.ok(response);
     }
 
-    /**
-     * Actualizar estado de una solicitud.
-     * Disponible solo para administradores y operadores.
-     *
-     * @param solicitudId identificador de la solicitud
-     * @param nuevoEstado nuevo estado
-     * @return solicitud actualizada
-     */
     @PutMapping("/{solicitudId}/estado")
-    @PreAuthorize("hasAnyRole('ADMIN', 'OPERADOR')")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Actualizar estado de solicitud",
                description = "Cambia manualmente el estado de una solicitud")
     @ApiResponses(value = {
@@ -304,17 +237,8 @@ public class SolicitudController {
         return ResponseEntity.ok(response);
     }
 
-    /**
-     * Actualizar estimaciones de costo y tiempo.
-     * Disponible para operadores y administradores.
-     *
-     * @param solicitudId identificador de la solicitud
-     * @param costoEstimado costo estimado
-     * @param tiempoEstimadoHoras tiempo estimado en horas
-     * @return solicitud actualizada
-     */
     @PutMapping("/{solicitudId}/estimaciones")
-    @PreAuthorize("hasAnyRole('ADMIN', 'OPERADOR')")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Actualizar estimaciones",
                description = "Actualiza costo y tiempo estimados de una solicitud")
     @ApiResponses(value = {

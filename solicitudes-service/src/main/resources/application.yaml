@@ -18,24 +18,25 @@ spring:
 
   jackson:
     serialization:
-      fail-on-empty-beans: false #Configuración para evitar errores con entidades JPA vacias
+      fail-on-empty-beans: false
 
   security:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: http://localhost:8080/realms/tpi-backend #URL del servidor de autorización
+          # Permite apuntar a localhost o al contenedor keycloak dentro de docker-compose
+          issuer-uri: ${KEYCLOAK_ISSUER_URI:http://keycloak:8080/realms/tpi-backend}
 
 logging:
   level:
-    root: INFO #Nivel de log global
-    ar.edu.utn.frc.backend.tpi.solicitudes: DEBUG #Nivel de log específico para el paquete del servicio de solicitudes
+    root: INFO
+    ar.edu.utn.frc.backend.tpi.solicitudes: DEBUG
 
 management:
   endpoints:
     web:
       exposure:
-        include: health,info,metrics #Exponer endpoints de salud, info y métricas
+        include: health,info,metrics
   endpoint:
     health:
-      show-details: always #Mostrar detalles de salud siempre
+      show-details: always

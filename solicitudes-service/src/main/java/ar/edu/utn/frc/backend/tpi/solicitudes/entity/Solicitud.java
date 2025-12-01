@@ -52,7 +52,7 @@ public class Solicitud {
     private Double destinoLongitud;
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private EstadoSolicitud estado; // PENDIENTE, PROGRAMADA, EN_TRANSITO, FINALIZADA
+    private EstadoSolicitud estado; // BORRADOR, PROGRAMADA, EN_TRANSITO, ENTREGADA
     @Column(name = "costo_estimado")
     private Double costoEstimado; // Calculado al momento de crear la solicitud
     @Column(name = "costo_final")

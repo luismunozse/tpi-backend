@@ -2,8 +2,8 @@ package ar.edu.utn.frc.backend.tpi.solicitudes.entity;
 
 public enum EstadoSolicitud {
     
-    PENDIENTE,
+    BORRADOR,
     PROGRAMADA,
     EN_TRANSITO,
-    FINALIZADA
+    ENTREGADA
 }
