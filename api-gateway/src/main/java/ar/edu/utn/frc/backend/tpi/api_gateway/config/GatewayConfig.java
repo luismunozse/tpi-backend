@@ -16,13 +16,18 @@ public class GatewayConfig {
                                      @Value("${tpi.gateway.costos-service-url}") String costosUrl) {
         return builder.routes()
                 .route("solicitudes-service", r -> r
-                        .path("/api/solicitudes/**", "/api/clientes/**")
+                        .path("/solicitudes/**", "/clientes/**")
+                        .filters(f -> f.rewritePath("/solicitudes/(?<segment>.*)", "/api/solicitudes/${segment}")
+                                       .rewritePath("/clientes/(?<segment>.*)", "/api/clientes/${segment}"))
                         .uri(solicitudesUrl))
                 .route("flota-service", r -> r
-                        .path("/api/camiones/**", "/api/depositos/**")
+                        .path("/flota/camiones/**", "/flota/depositos/**")
+                        .filters(f -> f.rewritePath("/flota/camiones/(?<segment>.*)", "/api/camiones/${segment}")
+                                       .rewritePath("/flota/depositos/(?<segment>.*)", "/api/depositos/${segment}"))
                         .uri(flotaUrl))
                 .route("costos-service", r -> r
-                        .path("/api/tarifas/**")
+                        .path("/costos/**")
+                        .filters(f -> f.rewritePath("/costos/(?<segment>.*)", "/api/tarifas/${segment}"))
                         .uri(costosUrl))
                 .build();
     }

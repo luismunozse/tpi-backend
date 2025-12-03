@@ -3,62 +3,68 @@ package ar.edu.utn.frc.backend.tpi.api_gateway.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
-import org.springframework.security.config.web.server.ServerHttpSecurity;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.jwt.Jwt;
-import org.springframework.security.oauth2.server.resource.authentication.ReactiveJwtAuthenticationConverter;
-import org.springframework.security.web.server.SecurityWebFilterChain;
-import reactor.core.publisher.Flux;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
+import org.springframework.security.web.SecurityFilterChain;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Configuration
+@EnableWebSecurity
 public class SecurityConfig {
 
-    // Configura la seguridad del API Gateway como Resource Server con JWT emitidos por Keycloak.
     @Bean
-    public SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http) { 
-        return http // Configuración de seguridad HTTP
-                .csrf(ServerHttpSecurity.CsrfSpec::disable) // Deshabilita CSRF para APIs REST 
-                .authorizeExchange(exchanges -> exchanges
-                        .pathMatchers(HttpMethod.OPTIONS).permitAll()
-                        .pathMatchers("/actuator/health", "/actuator/info").permitAll()
-                        .pathMatchers("/api/solicitudes/**", "/api/clientes/**")
-                        .hasAnyRole("CLIENTE", "ADMIN", "TRANSPORTISTA")
-                        .pathMatchers("/api/camiones/**", "/api/depositos/**")
-                        .hasAnyRole("ADMIN", "TRANSPORTISTA")
-                        .pathMatchers("/api/tarifas/**")
-                        .hasAnyRole("ADMIN", "CLIENTE")
-                        .anyExchange().authenticated()
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        // Define reglas de acceso por path y roles; valida JWT emitidos por Keycloak.
+        http
+                .csrf(csrf -> csrf.disable())
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                        .requestMatchers("/actuator/health", "/actuator/info").permitAll()
+                        .requestMatchers("/solicitudes/**", "/clientes/**")
+                        .hasAnyAuthority("CLIENTE", "ADMIN", "TRANSPORTISTA")
+                        .requestMatchers("/flota/camiones/**", "/flota/depositos/**")
+                        .hasAnyAuthority("ADMIN", "TRANSPORTISTA")
+                        .requestMatchers("/costos/**")
+                        .hasAnyAuthority("ADMIN", "CLIENTE")
+                        .anyRequest().authenticated()
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2
                         .jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter()))
-                )
-                .oauth2Login(oauth2 -> {})
-                .build();
+                );
+        return http.build();
     }
 
     @Bean
-    public ReactiveJwtAuthenticationConverter jwtAuthenticationConverter() {
-        ReactiveJwtAuthenticationConverter converter = new ReactiveJwtAuthenticationConverter();
+    public JwtAuthenticationConverter jwtAuthenticationConverter() {
+        // Convierte roles del JWT a GrantedAuthority para Spring Security.
+        JwtAuthenticationConverter converter = new JwtAuthenticationConverter();
         converter.setJwtGrantedAuthoritiesConverter(this::extractAuthorities);
         return converter;
     }
 
-    private Flux<GrantedAuthority> extractAuthorities(Jwt jwt) {
-        return Flux.fromIterable(parseRoles(jwt))
-                .map(role -> "ROLE_" + role.toUpperCase())
-                .map(SimpleGrantedAuthority::new);
+    // Extrae y convierte roles del JWT a GrantedAuthority.
+    private Collection<GrantedAuthority> extractAuthorities(Jwt jwt) {
+        return parseRoles(jwt).stream()
+                .map(String::toUpperCase)
+                .map(SimpleGrantedAuthority::new)
+                .map(authority -> (GrantedAuthority) authority)
+                .collect(Collectors.toList());
     }
 
+    // Parsea roles desde realm_access y resource_access en el JWT.
     private Collection<String> parseRoles(Jwt jwt) {
         List<String> roles = new ArrayList<>();
-
+        // Extrae roles del realm_access 
         Map<String, Object> realmAccess = jwt.getClaim("realm_access");
         if (realmAccess != null) {
             Object realmRoles = realmAccess.get("roles");
@@ -66,7 +72,7 @@ public class SecurityConfig {
                 list.stream().filter(String.class::isInstance).map(String.class::cast).forEach(roles::add);
             }
         }
-
+        // Extrae roles del resource_access 
         Map<String, Object> resourceAccess = jwt.getClaim("resource_access");
         if (resourceAccess != null) {
             for (Object clientEntry : resourceAccess.values()) {

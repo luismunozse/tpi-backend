@@ -73,3 +73,20 @@ UI en cada servicio:
 ## Notas
 - Configuración de seguridad: cada servicio expone `/actuator/health` y `/actuator/info` sin auth; resto protegido por JWT.
 - Para cálculo de costos con geolocalización se usa Google Distance Matrix; asegúrate de tener la API key habilitada.
+
+## Errores 
+- **A El Registro "Atómico" de la Solicitud (RF 1a y 1b)**
+Requerimiento: "La solicitud incluye la creación del contenedor... e incluye el registro del cliente si no existe previamente".
+- Tu código actual: En SolicitudService.crearSolicitud, recibes clienteId y contenedorId. Si no existen en la base de datos, lanzas un error:
+- El problema: El usuario tiene que hacer 3 llamadas (Crear Cliente -> Crear Contenedor -> Crear Solicitud). El enunciado pide que sea una sola llamada.
+
+- **B. Cálculo de Estadía en Depósito (RF "Calcular costo total... c. Estadía")**
+Requerimiento: "Estadía en depósitos (calculada a partir de la diferencia entre fechas reales de entrada y salida)".
+
+Tu código actual: En SolicitudService.finalizarSolicitud, sumas el costoReal de los tramos. Pero, ¿quién calcula ese costo real de estadía?
+
+Tienes costoEstadiaDiaria en Deposito y en Tarifa.
+
+Pero al finalizar un tramo (registrarFinTramo), solo guardas la fecha. No veo que estés calculando automáticamente: (FechaSalida - FechaEntrada) * CostoDia.
+
+Riesgo: Si el profesor finaliza un tramo y el costo sigue siendo "0" o "null", preguntará dónde está la lógica de negocio.
