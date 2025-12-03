@@ -32,9 +32,8 @@ public class SecurityConfig {
                         .requestMatchers("/actuator/health", "/actuator/info").permitAll()
                         .requestMatchers("/auth/**").permitAll()
                         .requestMatchers("/api/solicitudes/**").hasAnyRole("CLIENTE", "ADMIN")
-                        .requestMatchers("/api/camiones/**").hasAnyRole("ADMIN", "TRANSPORTISTA")
-                        .requestMatchers("/api/depositos/**").hasAnyRole("ADMIN", "TRANSPORTISTA")
-                        .requestMatchers("/api/tarifas/**").hasAnyRole("ADMIN", "CLIENTE")
+                        .requestMatchers("/api/flota/**").hasAnyRole("ADMIN", "TRANSPORTISTA")
+                        .requestMatchers("/api/costos/**").hasAnyRole("ADMIN", "CLIENTE")
                         .anyRequest().authenticated()
                 );
         return http.build();
