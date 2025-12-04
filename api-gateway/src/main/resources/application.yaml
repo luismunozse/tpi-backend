@@ -12,19 +12,9 @@ spring:
 
   security:
     oauth2:
-      client: # Configuración del cliente OAuth2 para el API Gateway
-        registration: # Configuración de registro del cliente OAuth2
-          keycloak: # Nombre del proveedor de OAuth2
-            client-id: api-gateway # ID del cliente registrado en Keycloak
-            client-secret: gateway_secret # Se puede configurar como una variable de entorno
-            authorization-grant-type: authorization_code # Tipo de concesión de autorización
-            scope: openid, profile, email # Alcances solicitados
-        provider:
-          keycloak:
-            issuer-uri: ${KEYCLOAK_ISSUER_URI:http://keycloak:8080/realms/tpi-backend} # URI del emisor de tokens
       resourceserver:
         jwt:
-          issuer-uri: ${KEYCLOAK_ISSUER_URI:http://keycloak:8080/realms/tpi-backend} # URI del emisor de tokens para la validación de JWT
+          issuer-uri: ${KEYCLOAK_ISSUER_URI:http://keycloak:8080/realms/tpi-backend}
 
 logging:
   level:

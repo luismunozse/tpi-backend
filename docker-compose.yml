@@ -147,8 +147,6 @@ services:
             - 8080:8080
         environment:
             - SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI=http://keycloak:8080/realms/tpi-backend
-            - SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_KEYCLOAK_CLIENT_ID=api-gateway
-            - SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_KEYCLOAK_CLIENT_SECRET=gateway-secret
             - TPI_GATEWAY_SOLICITUDES_SERVICE_URL=http://solicitudes-service:8081
             - TPI_GATEWAY_FLOTA_SERVICE_URL=http://flota-service:8082
             - TPI_GATEWAY_COSTOS_SERVICE_URL=http://costos-service:8083
