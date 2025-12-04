@@ -4,8 +4,9 @@ services:
     keycloak:
         image: quay.io/keycloak/keycloak:24.0.3
         container_name: keycloak
-        command: start-dev
-        ports: 
+        command: start-dev # Inicia Keycloak en modo de desarrollo
+        restart: unless-stopped # Reinicia el contenedor a menos que se detenga manualmente
+        ports:
             - 9090:8080
         environment:
             - KEYCLOAK_ADMIN=admin
@@ -14,10 +15,17 @@ services:
             - keycloak_data:/opt/keycloak/data
         networks:
             - tpibackend
+        healthcheck: # Configuración de healthcheck para Keycloak
+            test: ["CMD-SHELL", "exec 3<>/dev/tcp/127.0.0.1/8080 || exit 1"] # Verifica si el puerto 8080 está abierto
+            interval: 10s # Comprueba cada 10 segundos que el servicio esté saludable
+            timeout: 5s # Tiempo de espera de 5 segundos para la comprobación
+            retries: 10 # Reintenta hasta 10 veces antes de marcar como no saludable
+            start_period: 30s # Tiempo de espera inicial de 30 segundos antes de iniciar las comprobaciones
 
     solicitudes-db:
         image: postgres:15
         container_name: solicitudes-db
+        restart: unless-stopped
         environment:
             - POSTGRES_DB=solicitudes_db
             - POSTGRES_USER=solicitudes_user
@@ -26,10 +34,17 @@ services:
             - solicitudes_data:/var/lib/postgresql/data
         networks:
             - tpibackend
+        healthcheck:
+            test: ["CMD-SHELL", "pg_isready -U solicitudes_user -d solicitudes_db"] # Comprueba si la base de datos está lista
+            interval: 10s
+            timeout: 5s
+            retries: 5
+            start_period: 10s
         
     flota-db:
         image: postgres:15
         container_name: flota-db
+        restart: unless-stopped
         environment:
             - POSTGRES_DB=flota_db
             - POSTGRES_USER=flota_user
@@ -38,10 +53,17 @@ services:
             - flota_data:/var/lib/postgresql/data
         networks:
             - tpibackend
+        healthcheck:
+            test: ["CMD-SHELL", "pg_isready -U flota_user -d flota_db"] # Comprueba si la base de datos está lista
+            interval: 10s
+            timeout: 5s
+            retries: 5
+            start_period: 10s
 
     costos-db:
         image: postgres:15
         container_name: costos-db
+        restart: unless-stopped
         environment:
             - POSTGRES_DB=costos_db
             - POSTGRES_USER=costos_user
@@ -50,20 +72,29 @@ services:
             - costos_data:/var/lib/postgresql/data
         networks:
             - tpibackend
+        healthcheck:
+            test: ["CMD-SHELL", "pg_isready -U costos_user -d costos_db"] # Comprueba si la base de datos está lista
+            interval: 10s
+            timeout: 5s
+            retries: 5
+            start_period: 10s
 
     solicitudes-service:
         build:
             context: ./solicitudes-service
             dockerfile: Dockerfile
         container_name: solicitudes-service
+        restart: unless-stopped
         environment:
             - SPRING_DATASOURCE_URL=jdbc:postgresql://solicitudes-db:5432/solicitudes_db
             - SPRING_DATASOURCE_USERNAME=solicitudes_user
             - SPRING_DATASOURCE_PASSWORD=solicitudes_password
             - SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI=http://keycloak:8080/realms/tpi-backend
         depends_on:
-            - solicitudes-db
-            - keycloak
+            solicitudes-db:
+                condition: service_healthy
+            keycloak:
+                condition: service_healthy
         networks:
             - tpibackend
     
@@ -72,14 +103,17 @@ services:
             context: ./flota-service
             dockerfile: Dockerfile
         container_name: flota-service
+        restart: unless-stopped
         environment:
             - SPRING_DATASOURCE_URL=jdbc:postgresql://flota-db:5432/flota_db
             - SPRING_DATASOURCE_USERNAME=flota_user
             - SPRING_DATASOURCE_PASSWORD=flota_password
             - SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI=http://keycloak:8080/realms/tpi-backend
         depends_on:
-            - flota-db
-            - keycloak
+            flota-db:
+                condition: service_healthy
+            keycloak:
+                condition: service_healthy
         networks:
             - tpibackend
 
@@ -88,6 +122,7 @@ services:
             context: ./costos-service
             dockerfile: Dockerfile
         container_name: costos-service
+        restart: unless-stopped
         environment:
             - SPRING_DATASOURCE_URL=jdbc:postgresql://costos-db:5432/costos_db
             - SPRING_DATASOURCE_USERNAME=costos_user
@@ -95,8 +130,10 @@ services:
             - SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI=http://keycloak:8080/realms/tpi-backend
             - GOOGLE_MAPS_API_KEY=${GOOGLE_MAPS_API_KEY}
         depends_on:
-            - costos-db
-            - keycloak
+            costos-db:
+                condition: service_healthy
+            keycloak:
+                condition: service_healthy
         networks:
             - tpibackend
 
@@ -105,17 +142,25 @@ services:
             context: ./api-gateway
             dockerfile: Dockerfile
         container_name: api-gateway
+        restart: unless-stopped
         ports:
             - 8080:8080
         environment:
             - SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI=http://keycloak:8080/realms/tpi-backend
             - SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_KEYCLOAK_CLIENT_ID=api-gateway
             - SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_KEYCLOAK_CLIENT_SECRET=gateway-secret
+            - TPI_GATEWAY_SOLICITUDES_SERVICE_URL=http://solicitudes-service:8081
+            - TPI_GATEWAY_FLOTA_SERVICE_URL=http://flota-service:8082
+            - TPI_GATEWAY_COSTOS_SERVICE_URL=http://costos-service:8083
         depends_on:
-            - solicitudes-service
-            - flota-service
-            - costos-service
-            - keycloak
+            solicitudes-service:
+                condition: service_started
+            flota-service:
+                condition: service_started
+            costos-service:
+                condition: service_started
+            keycloak:
+                condition: service_healthy
         networks:
             - tpibackend
 
