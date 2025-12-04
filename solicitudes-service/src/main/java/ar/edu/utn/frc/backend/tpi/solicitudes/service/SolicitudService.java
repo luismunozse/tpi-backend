@@ -11,6 +11,9 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import ar.edu.utn.frc.backend.tpi.solicitudes.dto.ClienteResponse;
+import ar.edu.utn.frc.backend.tpi.solicitudes.dto.ContenedorRequest;
+import ar.edu.utn.frc.backend.tpi.solicitudes.dto.ContenedorResponse;
 import ar.edu.utn.frc.backend.tpi.solicitudes.dto.SolicitudRequest;
 import ar.edu.utn.frc.backend.tpi.solicitudes.dto.SolicitudResponse;
 import ar.edu.utn.frc.backend.tpi.solicitudes.entity.Cliente;
@@ -51,32 +54,59 @@ public class SolicitudService {
     private final ContenedorRepository contenedorRepository;
     private final RutaRepository rutaRepository;
     private final TramoRepository tramoRepository;
+    private final ClienteService clienteService;
+    private final ContenedorService contenedorService;
 
     /**
      * CU-01: Registrar solicitud de transporte.
-     * Crea una nueva solicitud asociada a un cliente y contenedor existentes.
+     * Implementa creación atómica de cliente y contenedor (RF 1.1, RF 1.2).
+     * Valida que el email del JWT coincida con el email del cliente en el request.
      * La solicitud se crea en estado BORRADOR.
      *
-     * @param solicitudRequest datos de la solicitud
+     * @param solicitudRequest datos de la solicitud (incluye cliente y contenedor completos)
      * @return SolicitudResponse con los datos de la solicitud creada
-     * @throws IllegalArgumentException si el cliente o contenedor no existen
+     * @throws IllegalArgumentException si los datos son inválidos
+     * @throws org.springframework.security.access.AccessDeniedException si el email no coincide
      */
     @Transactional
     public SolicitudResponse crearSolicitud(SolicitudRequest solicitudRequest) {
-        log.info("Creando solicitud para cliente {} y contenedor {}",
-                solicitudRequest.getClienteId(), solicitudRequest.getContenedorId());
+        log.info("Creando solicitud con patrón obtener-o-crear para cliente {} y contenedor {}",
+                solicitudRequest.getCliente().getEmail(),
+                solicitudRequest.getContenedor().getNumeroSerie());
 
-        // Validar que el cliente existe
-        Cliente cliente = clienteRepository.findById(solicitudRequest.getClienteId())
-                .orElseThrow(() -> new IllegalArgumentException(
-                        "Cliente no encontrado con id: " + solicitudRequest.getClienteId()));
+        // Obtener JWT y extraer email del usuario autenticado
+        Jwt jwt = getJwt();
+        String emailToken = obtenerEmail(jwt);
 
-        // Validar que el contenedor existe
-        Contenedor contenedor = contenedorRepository.findById(solicitudRequest.getContenedorId())
-                .orElseThrow(() -> new IllegalArgumentException(
-                        "Contenedor no encontrado con id: " + solicitudRequest.getContenedorId()));
+        // Validar que el email del token coincida con el email del cliente en el request
+        if (emailToken == null || !emailToken.equalsIgnoreCase(solicitudRequest.getCliente().getEmail())) {
+            throw new org.springframework.security.access.AccessDeniedException(
+                    "El email del cliente debe coincidir con el email del usuario autenticado");
+        }
 
-        // Crear la solicitud
+        // Obtener o crear cliente usando el patrón find-or-create
+        ClienteResponse clienteResponse = clienteService.obtenerOCrearCliente(solicitudRequest.getCliente());
+        log.info("Cliente obtenido/creado con id: {}", clienteResponse.getId());
+
+        // Obtener el cliente como entidad para asociarlo a la solicitud
+        Cliente cliente = clienteRepository.findById(clienteResponse.getId())
+                .orElseThrow(() -> new IllegalStateException(
+                        "Error al obtener cliente recién creado con id: " + clienteResponse.getId()));
+
+        // Configurar el clienteId en el contenedor request antes de crear/obtener
+        ContenedorRequest contenedorRequest = solicitudRequest.getContenedor();
+        contenedorRequest.setClienteId(clienteResponse.getId());
+
+        // Obtener o crear contenedor usando el patrón find-or-create
+        ContenedorResponse contenedorResponse = contenedorService.obtenerOCrearContenedor(contenedorRequest);
+        log.info("Contenedor obtenido/creado con id: {}", contenedorResponse.getId());
+
+        // Obtener el contenedor como entidad para asociarlo a la solicitud
+        Contenedor contenedor = contenedorRepository.findById(contenedorResponse.getId())
+                .orElseThrow(() -> new IllegalStateException(
+                        "Error al obtener contenedor recién creado con id: " + contenedorResponse.getId()));
+
+        // Crear la solicitud con las entidades obtenidas/creadas
         Solicitud solicitud = Solicitud.builder()
                 .cliente(cliente)
                 .contenedor(contenedor)
@@ -91,7 +121,8 @@ public class SolicitudService {
                 .build();
 
         Solicitud solicitudGuardada = solicitudRepository.save(solicitud);
-        log.info("Solicitud creada con id: {}", solicitudGuardada.getId());
+        log.info("Solicitud creada con id: {} para cliente {} (email: {})",
+                solicitudGuardada.getId(), cliente.getId(), cliente.getEmail());
 
         return mapToResponse(solicitudGuardada);
     }

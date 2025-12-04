@@ -1,5 +1,6 @@
 package ar.edu.utn.frc.backend.tpi.solicitudes.dto;
 
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
@@ -12,6 +13,7 @@ import lombok.NoArgsConstructor;
 /**
  * DTO para creación de solicitudes de transporte.
  * Usado en CU-01: Registrar solicitud de transporte.
+ * Soporta creación atómica de cliente y contenedor (RF 1.1, RF 1.2).
  */
 @Data
 @Builder
@@ -19,11 +21,13 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class SolicitudRequest {
 
-    @NotNull(message = "El ID del cliente es obligatorio")
-    private Long clienteId;
+    @NotNull(message = "Los datos del cliente son obligatorios")
+    @Valid
+    private ClienteRequest cliente;
 
-    @NotNull(message = "El ID del contenedor es obligatorio")
-    private Long contenedorId;
+    @NotNull(message = "Los datos del contenedor son obligatorios")
+    @Valid
+    private ContenedorRequest contenedor;
 
     @NotBlank(message = "La dirección de origen es obligatoria")
     private String origenDireccion;

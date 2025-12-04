@@ -52,19 +52,21 @@ public class SolicitudController {
     @PostMapping
     @PreAuthorize("hasAnyRole('CLIENTE', 'ADMIN')")
     @Operation(summary = "Crear solicitud de transporte",
-               description = "Registra una nueva solicitud de transporte de contenedor (CU-01)")
+               description = "Registra una nueva solicitud de transporte de contenedor (CU-01). " +
+                             "Implementa creación atómica: si el cliente o contenedor no existen, se crean automáticamente (RF 1.1, RF 1.2).")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "201", description = "Solicitud creada exitosamente",
                      content = @Content(schema = @Schema(implementation = SolicitudResponse.class))),
         @ApiResponse(responseCode = "400", description = "Datos inválidos"),
         @ApiResponse(responseCode = "401", description = "No autorizado"),
-        @ApiResponse(responseCode = "404", description = "Cliente o contenedor no encontrado")
+        @ApiResponse(responseCode = "403", description = "Email del cliente no coincide con el usuario autenticado")
     })
     public ResponseEntity<SolicitudResponse> crearSolicitud(
             @Valid @RequestBody SolicitudRequest request) {
 
-        log.info("REST: Creando solicitud para cliente {} y contenedor {}",
-                request.getClienteId(), request.getContenedorId());
+        log.info("REST: Creando solicitud para cliente (email: {}) y contenedor (serie: {})",
+                request.getCliente().getEmail(),
+                request.getContenedor().getNumeroSerie());
 
         SolicitudResponse response = solicitudService.crearSolicitud(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);

@@ -12,7 +12,7 @@
 	<artifactId>api-gateway</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>api-gateway</name>
-	<description>Costos/Geolocalización</description>
+	<description>Api-Gateway</description>
 	<url/>
 	<licenses>
 		<license/>

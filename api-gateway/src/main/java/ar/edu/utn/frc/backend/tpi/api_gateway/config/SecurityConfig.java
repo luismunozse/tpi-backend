@@ -28,14 +28,28 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
+                        // Endpoints públicos
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers("/actuator/health", "/actuator/info").permitAll()
+
+                        // Tramos: TRANSPORTISTA puede consultar (GET) y registrar inicio/fin (POST)
+                        .requestMatchers(HttpMethod.GET, "/solicitudes/tramos/**")
+                        .hasAnyAuthority("TRANSPORTISTA", "ADMIN", "CLIENTE")
+                        .requestMatchers(HttpMethod.POST, "/solicitudes/tramos/*/inicio", "/solicitudes/tramos/*/fin")
+                        .hasAnyAuthority("TRANSPORTISTA", "ADMIN")
+
+                        // Solicitudes y clientes: CLIENTE puede crear/consultar, ADMIN gestión completa
                         .requestMatchers("/solicitudes/**", "/clientes/**")
-                        .hasAnyAuthority("CLIENTE", "ADMIN", "TRANSPORTISTA")
+                        .hasAnyAuthority("CLIENTE", "ADMIN")
+
+                        // Flota: ADMIN y TRANSPORTISTA (RF6: asignar camión)
                         .requestMatchers("/flota/camiones/**", "/flota/depositos/**")
                         .hasAnyAuthority("ADMIN", "TRANSPORTISTA")
+
+                        // Costos: ADMIN y CLIENTE (RF estimaciones)
                         .requestMatchers("/costos/**")
                         .hasAnyAuthority("ADMIN", "CLIENTE")
+
                         .anyRequest().authenticated()
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2

@@ -246,6 +246,29 @@ public class ContenedorService {
     }
 
     /**
+     * Obtener un contenedor por número de serie o crearlo si no existe.
+     * Implementa el patrón obtener-o-crear para RF 1.1.
+     *
+     * @param request datos del contenedor
+     * @return ContenedorResponse con los datos del contenedor (existente o recién creado)
+     * @throws IllegalArgumentException si el cliente no existe
+     */
+    @Transactional
+    public ContenedorResponse obtenerOCrearContenedor(ContenedorRequest request) {
+        log.info("Obteniendo o creando contenedor con número de serie: {}", request.getNumeroSerie());
+
+        return contenedorRepository.findByNumeroSerie(request.getNumeroSerie())
+                .map(contenedor -> {
+                    log.info("Contenedor existente encontrado con id: {}", contenedor.getId());
+                    return ContenedorMapper.toResponse(contenedor);
+                })
+                .orElseGet(() -> {
+                    log.info("Creando nuevo contenedor");
+                    return crearContenedor(request);
+                });
+    }
+
+    /**
      * Verificar si un contenedor puede ser asignado a una solicitud.
      * Debe estar en estado REGISTRADO o LISTO_PARA_RETIRO.
      *
