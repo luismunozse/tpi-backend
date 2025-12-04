@@ -10,6 +10,8 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
+import org.springframework.http.HttpStatus;
 
 import ar.edu.utn.frc.backend.tpi.solicitudes.dto.ClienteResponse;
 import ar.edu.utn.frc.backend.tpi.solicitudes.dto.ContenedorRequest;
@@ -78,10 +80,12 @@ public class SolicitudService {
         Jwt jwt = getJwt();
         String emailToken = obtenerEmail(jwt);
 
-        // Validar que el email del token coincida con el email del cliente en el request
+        // Validar que el email del token coincida con el email del cliente en el request.
+        // Si no coincide, consideramos que el cliente no está registrado en Keycloak y frenamos.
         if (emailToken == null || !emailToken.equalsIgnoreCase(solicitudRequest.getCliente().getEmail())) {
-            throw new org.springframework.security.access.AccessDeniedException(
-                    "El email del cliente debe coincidir con el email del usuario autenticado");
+            throw new ResponseStatusException(
+                    HttpStatus.FORBIDDEN,
+                    "Cliente no registrado en Keycloak. Vaya a Keycloak y regístrelo.");
         }
 
         // Obtener o crear cliente usando el patrón find-or-create

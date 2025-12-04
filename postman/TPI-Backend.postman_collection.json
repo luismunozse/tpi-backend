@@ -1,932 +1,1582 @@
 {
-	"info": {
-		"_postman_id": "tpi-backend-collection",
-		"name": "TPI Backend - Sistema de Transporte de Contenedores",
-		"description": "Colección de endpoints para el sistema de gestión de transporte de contenedores.\n\nAutenticación: OAuth2 con Keycloak (Resource Owner Password Credentials)",
-		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
-	},
-	"auth": {
-		"type": "bearer",
-		"bearer": [
-			{
-				"key": "token",
-				"value": "{{access_token}}",
-				"type": "string"
-			}
-		]
-	},
-	"item": [
-		{
-			"name": "Authentication",
-			"item": [
-				{
-					"name": "Get Token (CLIENTE)",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"if (pm.response.code === 200) {",
-									"    const jsonData = pm.response.json();",
-									"    pm.environment.set(\"access_token\", jsonData.access_token);",
-									"    pm.environment.set(\"refresh_token\", jsonData.refresh_token);",
-									"    console.log(\"Token obtenido exitosamente\");",
-									"}"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "urlencoded",
-							"urlencoded": [
-								{
-									"key": "client_id",
-									"value": "{{client_id}}",
-									"type": "text"
-								},
-								{
-									"key": "username",
-									"value": "{{cliente_username}}",
-									"type": "text"
-								},
-								{
-									"key": "password",
-									"value": "{{cliente_password}}",
-									"type": "text"
-								},
-								{
-									"key": "grant_type",
-									"value": "password",
-									"type": "text"
-								}
-							]
-						},
-						"url": {
-							"raw": "{{keycloak_url}}/realms/{{realm}}/protocol/openid-connect/token",
-							"host": [
-								"{{keycloak_url}}"
-							],
-							"path": [
-								"realms",
-								"{{realm}}",
-								"protocol",
-								"openid-connect",
-								"token"
-							]
-						},
-						"description": "Obtiene un access token para el usuario CLIENTE usando Direct Access Grant (Password Grant Type)"
-					},
-					"response": []
-				},
-				{
-					"name": "Get Token (ADMIN)",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"if (pm.response.code === 200) {",
-									"    const jsonData = pm.response.json();",
-									"    pm.environment.set(\"access_token\", jsonData.access_token);",
-									"    pm.environment.set(\"refresh_token\", jsonData.refresh_token);",
-									"    console.log(\"Token ADMIN obtenido exitosamente\");",
-									"}"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "urlencoded",
-							"urlencoded": [
-								{
-									"key": "client_id",
-									"value": "{{client_id}}",
-									"type": "text"
-								},
-								{
-									"key": "username",
-									"value": "{{admin_username}}",
-									"type": "text"
-								},
-								{
-									"key": "password",
-									"value": "{{admin_password}}",
-									"type": "text"
-								},
-								{
-									"key": "grant_type",
-									"value": "password",
-									"type": "text"
-								}
-							]
-						},
-						"url": {
-							"raw": "{{keycloak_url}}/realms/{{realm}}/protocol/openid-connect/token",
-							"host": [
-								"{{keycloak_url}}"
-							],
-							"path": [
-								"realms",
-								"{{realm}}",
-								"protocol",
-								"openid-connect",
-								"token"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Get Token (TRANSPORTISTA)",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"if (pm.response.code === 200) {",
-									"    const jsonData = pm.response.json();",
-									"    pm.environment.set(\"access_token\", jsonData.access_token);",
-									"    pm.environment.set(\"refresh_token\", jsonData.refresh_token);",
-									"    console.log(\"Token TRANSPORTISTA obtenido exitosamente\");",
-									"}"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "urlencoded",
-							"urlencoded": [
-								{
-									"key": "client_id",
-									"value": "{{client_id}}",
-									"type": "text"
-								},
-								{
-									"key": "username",
-									"value": "{{transportista_username}}",
-									"type": "text"
-								},
-								{
-									"key": "password",
-									"value": "{{transportista_password}}",
-									"type": "text"
-								},
-								{
-									"key": "grant_type",
-									"value": "password",
-									"type": "text"
-								}
-							]
-						},
-						"url": {
-							"raw": "{{keycloak_url}}/realms/{{realm}}/protocol/openid-connect/token",
-							"host": [
-								"{{keycloak_url}}"
-							],
-							"path": [
-								"realms",
-								"{{realm}}",
-								"protocol",
-								"openid-connect",
-								"token"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Refresh Token",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"if (pm.response.code === 200) {",
-									"    const jsonData = pm.response.json();",
-									"    pm.environment.set(\"access_token\", jsonData.access_token);",
-									"    pm.environment.set(\"refresh_token\", jsonData.refresh_token);",
-									"}"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "urlencoded",
-							"urlencoded": [
-								{
-									"key": "client_id",
-									"value": "{{client_id}}",
-									"type": "text"
-								},
-								{
-									"key": "refresh_token",
-									"value": "{{refresh_token}}",
-									"type": "text"
-								},
-								{
-									"key": "grant_type",
-									"value": "refresh_token",
-									"type": "text"
-								}
-							]
-						},
-						"url": {
-							"raw": "{{keycloak_url}}/realms/{{realm}}/protocol/openid-connect/token",
-							"host": [
-								"{{keycloak_url}}"
-							],
-							"path": [
-								"realms",
-								"{{realm}}",
-								"protocol",
-								"openid-connect",
-								"token"
-							]
-						}
-					},
-					"response": []
-				}
-			]
-		},
-		{
-			"name": "Solicitudes",
-			"item": [
-				{
-					"name": "Crear Solicitud (CU-01)",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"if (pm.response.code === 201) {",
-									"    const jsonData = pm.response.json();",
-									"    pm.environment.set(\"solicitud_id\", jsonData.id);",
-									"    console.log(\"Solicitud creada con ID: \" + jsonData.id);",
-									"}"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"cliente\": {\n    \"nombre\": \"Juan Pérez\",\n    \"email\": \"cliente1@example.com\",\n    \"telefono\": \"+5491112345678\",\n    \"direccion\": \"Av. Corrientes 1234\"\n  },\n  \"contenedor\": {\n    \"numeroSerie\": \"CONT-001\",\n    \"tipo\": \"40HC\",\n    \"peso\": 1500.0,\n    \"volumen\": 67.5\n  },\n  \"origenDireccion\": \"Buenos Aires\",\n  \"origenLatitud\": -34.603722,\n  \"origenLongitud\": -58.381592,\n  \"destinoDireccion\": \"Rosario\",\n  \"destinoLatitud\": -32.944766,\n  \"destinoLongitud\": -60.650243\n}"
-						},
-						"url": {
-							"raw": "{{gateway_url}}/solicitudes",
-							"host": [
-								"{{gateway_url}}"
-							],
-							"path": [
-								"solicitudes"
-							]
-						},
-						"description": "RF 1.1 y RF 1.2: Crea una solicitud con creación atómica de cliente y contenedor"
-					},
-					"response": []
-				},
-				{
-					"name": "Obtener Solicitud por ID (CU-02)",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{gateway_url}}/solicitudes/{{solicitud_id}}",
-							"host": [
-								"{{gateway_url}}"
-							],
-							"path": [
-								"solicitudes",
-								"{{solicitud_id}}"
-							]
-						},
-						"description": "Consulta el estado de una solicitud de transporte"
-					},
-					"response": []
-				},
-				{
-					"name": "Listar Todas las Solicitudes (ADMIN)",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{gateway_url}}/solicitudes",
-							"host": [
-								"{{gateway_url}}"
-							],
-							"path": [
-								"solicitudes"
-							]
-						},
-						"description": "Solo accesible para ADMIN"
-					},
-					"response": []
-				},
-				{
-					"name": "Solicitudes por Cliente",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{gateway_url}}/solicitudes/cliente/{{cliente_id}}",
-							"host": [
-								"{{gateway_url}}"
-							],
-							"path": [
-								"solicitudes",
-								"cliente",
-								"{{cliente_id}}"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Solicitudes Pendientes (CU-05)",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{gateway_url}}/solicitudes/pendientes",
-							"host": [
-								"{{gateway_url}}"
-							],
-							"path": [
-								"solicitudes",
-								"pendientes"
-							]
-						},
-						"description": "Obtiene todas las solicitudes que no están entregadas"
-					},
-					"response": []
-				},
-				{
-					"name": "Solicitudes por Estado",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{gateway_url}}/solicitudes/por-estado?estado=BORRADOR",
-							"host": [
-								"{{gateway_url}}"
-							],
-							"path": [
-								"solicitudes",
-								"por-estado"
-							],
-							"query": [
-								{
-									"key": "estado",
-									"value": "BORRADOR",
-									"description": "BORRADOR, EN_PROCESO, ENTREGADA"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Asignar Ruta a Solicitud (CU-04)",
-					"request": {
-						"method": "PUT",
-						"header": [],
-						"url": {
-							"raw": "{{gateway_url}}/solicitudes/{{solicitud_id}}/ruta/{{ruta_id}}",
-							"host": [
-								"{{gateway_url}}"
-							],
-							"path": [
-								"solicitudes",
-								"{{solicitud_id}}",
-								"ruta",
-								"{{ruta_id}}"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Actualizar Estado Solicitud",
-					"request": {
-						"method": "PUT",
-						"header": [],
-						"url": {
-							"raw": "{{gateway_url}}/solicitudes/{{solicitud_id}}/estado?nuevoEstado=EN_PROCESO",
-							"host": [
-								"{{gateway_url}}"
-							],
-							"path": [
-								"solicitudes",
-								"{{solicitud_id}}",
-								"estado"
-							],
-							"query": [
-								{
-									"key": "nuevoEstado",
-									"value": "EN_PROCESO"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Actualizar Estimaciones",
-					"request": {
-						"method": "PUT",
-						"header": [],
-						"url": {
-							"raw": "{{gateway_url}}/solicitudes/{{solicitud_id}}/estimaciones?costoEstimado=25000&tiempoEstimadoHoras=48",
-							"host": [
-								"{{gateway_url}}"
-							],
-							"path": [
-								"solicitudes",
-								"{{solicitud_id}}",
-								"estimaciones"
-							],
-							"query": [
-								{
-									"key": "costoEstimado",
-									"value": "25000"
-								},
-								{
-									"key": "tiempoEstimadoHoras",
-									"value": "48"
-								}
-							]
-						}
-					},
-					"response": []
-				}
-			]
-		},
-		{
-			"name": "Tramos",
-			"item": [
-				{
-					"name": "Registrar Inicio de Tramo (CU-07)",
-					"request": {
-						"method": "POST",
-						"header": [],
-						"url": {
-							"raw": "{{gateway_url}}/solicitudes/tramos/{{tramo_id}}/inicio",
-							"host": [
-								"{{gateway_url}}"
-							],
-							"path": [
-								"solicitudes",
-								"tramos",
-								"{{tramo_id}}",
-								"inicio"
-							]
-						},
-						"description": "TRANSPORTISTA registra el inicio de un tramo"
-					},
-					"response": []
-				},
-				{
-					"name": "Registrar Fin de Tramo (CU-08)",
-					"request": {
-						"method": "POST",
-						"header": [],
-						"url": {
-							"raw": "{{gateway_url}}/solicitudes/tramos/{{tramo_id}}/fin",
-							"host": [
-								"{{gateway_url}}"
-							],
-							"path": [
-								"solicitudes",
-								"tramos",
-								"{{tramo_id}}",
-								"fin"
-							]
-						},
-						"description": "TRANSPORTISTA registra el fin de un tramo"
-					},
-					"response": []
-				}
-			]
-		},
-		{
-			"name": "Clientes",
-			"item": [
-				{
-					"name": "Crear Cliente",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"if (pm.response.code === 201) {",
-									"    const jsonData = pm.response.json();",
-									"    pm.environment.set(\"cliente_id\", jsonData.id);",
-									"}"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"nombre\": \"María González\",\n  \"email\": \"maria.gonzalez@example.com\",\n  \"telefono\": \"+5491123456789\",\n  \"direccion\": \"Av. Santa Fe 2500\"\n}"
-						},
-						"url": {
-							"raw": "{{gateway_url}}/clientes",
-							"host": [
-								"{{gateway_url}}"
-							],
-							"path": [
-								"clientes"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Obtener Cliente por ID",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{gateway_url}}/clientes/{{cliente_id}}",
-							"host": [
-								"{{gateway_url}}"
-							],
-							"path": [
-								"clientes",
-								"{{cliente_id}}"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Listar Todos los Clientes",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{gateway_url}}/clientes",
-							"host": [
-								"{{gateway_url}}"
-							],
-							"path": [
-								"clientes"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Buscar Cliente por Email",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{gateway_url}}/clientes/email/cliente1@example.com",
-							"host": [
-								"{{gateway_url}}"
-							],
-							"path": [
-								"clientes",
-								"email",
-								"cliente1@example.com"
-							]
-						}
-					},
-					"response": []
-				}
-			]
-		},
-		{
-			"name": "Contenedores",
-			"item": [
-				{
-					"name": "Crear Contenedor",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"if (pm.response.code === 201) {",
-									"    const jsonData = pm.response.json();",
-									"    pm.environment.set(\"contenedor_id\", jsonData.id);",
-									"}"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"numeroSerie\": \"CONT-002\",\n  \"tipo\": \"20DV\",\n  \"peso\": 800.0,\n  \"volumen\": 33.2,\n  \"clienteId\": {{cliente_id}}\n}"
-						},
-						"url": {
-							"raw": "{{gateway_url}}/contenedores",
-							"host": [
-								"{{gateway_url}}"
-							],
-							"path": [
-								"contenedores"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Obtener Contenedor por ID",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{gateway_url}}/contenedores/{{contenedor_id}}",
-							"host": [
-								"{{gateway_url}}"
-							],
-							"path": [
-								"contenedores",
-								"{{contenedor_id}}"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Buscar Contenedor por Número de Serie",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{gateway_url}}/contenedores/serie/CONT-001",
-							"host": [
-								"{{gateway_url}}"
-							],
-							"path": [
-								"contenedores",
-								"serie",
-								"CONT-001"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Contenedores por Cliente",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{gateway_url}}/contenedores/cliente/{{cliente_id}}",
-							"host": [
-								"{{gateway_url}}"
-							],
-							"path": [
-								"contenedores",
-								"cliente",
-								"{{cliente_id}}"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Contenedores por Estado",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{gateway_url}}/contenedores/estado?estado=REGISTRADO",
-							"host": [
-								"{{gateway_url}}"
-							],
-							"path": [
-								"contenedores",
-								"estado"
-							],
-							"query": [
-								{
-									"key": "estado",
-									"value": "REGISTRADO",
-									"description": "REGISTRADO, LISTO_PARA_RETIRO, EN_TRASLADO, EN_DEPOSITO, ENTREGADO"
-								}
-							]
-						}
-					},
-					"response": []
-				}
-			]
-		},
-		{
-			"name": "Flota",
-			"item": [
-				{
-					"name": "Listar Camiones",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{gateway_url}}/flota/camiones",
-							"host": [
-								"{{gateway_url}}"
-							],
-							"path": [
-								"flota",
-								"camiones"
-							]
-						},
-						"description": "Accesible por ADMIN y TRANSPORTISTA"
-					},
-					"response": []
-				},
-				{
-					"name": "Obtener Camión por ID",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{gateway_url}}/flota/camiones/{{camion_id}}",
-							"host": [
-								"{{gateway_url}}"
-							],
-							"path": [
-								"flota",
-								"camiones",
-								"{{camion_id}}"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Listar Depósitos",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{gateway_url}}/flota/depositos",
-							"host": [
-								"{{gateway_url}}"
-							],
-							"path": [
-								"flota",
-								"depositos"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Obtener Depósito por ID",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{gateway_url}}/flota/depositos/{{deposito_id}}",
-							"host": [
-								"{{gateway_url}}"
-							],
-							"path": [
-								"flota",
-								"depositos",
-								"{{deposito_id}}"
-							]
-						}
-					},
-					"response": []
-				}
-			]
-		},
-		{
-			"name": "Costos",
-			"item": [
-				{
-					"name": "Listar Tarifas",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{gateway_url}}/costos/tarifas",
-							"host": [
-								"{{gateway_url}}"
-							],
-							"path": [
-								"costos",
-								"tarifas"
-							]
-						},
-						"description": "Accesible por ADMIN y CLIENTE"
-					},
-					"response": []
-				},
-				{
-					"name": "Obtener Tarifa por ID",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{gateway_url}}/costos/tarifas/{{tarifa_id}}",
-							"host": [
-								"{{gateway_url}}"
-							],
-							"path": [
-								"costos",
-								"tarifas",
-								"{{tarifa_id}}"
-							]
-						}
-					},
-					"response": []
-				}
-			]
-		},
-		{
-			"name": "Health & Actuator",
-			"item": [
-				{
-					"name": "Health Check",
-					"request": {
-						"auth": {
-							"type": "noauth"
-						},
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{gateway_url}}/actuator/health",
-							"host": [
-								"{{gateway_url}}"
-							],
-							"path": [
-								"actuator",
-								"health"
-							]
-						},
-						"description": "Endpoint público para verificar el estado del sistema"
-					},
-					"response": []
-				},
-				{
-					"name": "Info",
-					"request": {
-						"auth": {
-							"type": "noauth"
-						},
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{gateway_url}}/actuator/info",
-							"host": [
-								"{{gateway_url}}"
-							],
-							"path": [
-								"actuator",
-								"info"
-							]
-						}
-					},
-					"response": []
-				}
-			]
-		}
-	]
+    "info": {
+        "_postman_id": "tpi-backend-collection",
+        "name": "TPI Backend - Sistema de Transporte de Contenedores",
+        "description": "Colección de endpoints para el sistema de gestión de transporte de contenedores.\n\nAutenticación: OAuth2 con Keycloak (Resource Owner Password Credentials)",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "auth": {
+        "type": "bearer",
+        "bearer": [
+            {
+                "key": "token",
+                "value": "{{access_token}}",
+                "type": "string"
+            }
+        ]
+    },
+    "item": [
+        {
+            "name": "Authentication",
+            "item": [
+                {
+                    "name": "[CLIENTE] Get Token (CLIENTE)",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "if (pm.response.code === 200) {",
+                                    "    const jsonData = pm.response.json();",
+                                    "    pm.environment.set(\"access_token\", jsonData.access_token);",
+                                    "    pm.environment.set(\"refresh_token\", jsonData.refresh_token);",
+                                    "    console.log(\"Token obtenido exitosamente\");",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [],
+                        "body": {
+                            "mode": "urlencoded",
+                            "urlencoded": [
+                                {
+                                    "key": "client_id",
+                                    "value": "{{client_id}}",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "username",
+                                    "value": "{{cliente_username}}",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "password",
+                                    "value": "{{cliente_password}}",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "grant_type",
+                                    "value": "password",
+                                    "type": "text"
+                                }
+                            ]
+                        },
+                        "url": {
+                            "raw": "{{keycloak_url}}/realms/{{realm}}/protocol/openid-connect/token",
+                            "host": [
+                                "{{keycloak_url}}"
+                            ],
+                            "path": [
+                                "realms",
+                                "{{realm}}",
+                                "protocol",
+                                "openid-connect",
+                                "token"
+                            ]
+                        },
+                        "description": "Obtiene un access token para el usuario CLIENTE usando Direct Access Grant (Password Grant Type)"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "[ADMIN] Get Token (ADMIN)",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "if (pm.response.code === 200) {",
+                                    "    const jsonData = pm.response.json();",
+                                    "    pm.environment.set(\"access_token\", jsonData.access_token);",
+                                    "    pm.environment.set(\"refresh_token\", jsonData.refresh_token);",
+                                    "    console.log(\"Token ADMIN obtenido exitosamente\");",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [],
+                        "body": {
+                            "mode": "urlencoded",
+                            "urlencoded": [
+                                {
+                                    "key": "client_id",
+                                    "value": "{{client_id}}",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "username",
+                                    "value": "{{admin_username}}",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "password",
+                                    "value": "{{admin_password}}",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "grant_type",
+                                    "value": "password",
+                                    "type": "text"
+                                }
+                            ]
+                        },
+                        "url": {
+                            "raw": "{{keycloak_url}}/realms/{{realm}}/protocol/openid-connect/token",
+                            "host": [
+                                "{{keycloak_url}}"
+                            ],
+                            "path": [
+                                "realms",
+                                "{{realm}}",
+                                "protocol",
+                                "openid-connect",
+                                "token"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "[TRANSPORTISTA] Get Token (TRANSPORTISTA)",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "if (pm.response.code === 200) {",
+                                    "    const jsonData = pm.response.json();",
+                                    "    pm.environment.set(\"access_token\", jsonData.access_token);",
+                                    "    pm.environment.set(\"refresh_token\", jsonData.refresh_token);",
+                                    "    console.log(\"Token TRANSPORTISTA obtenido exitosamente\");",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [],
+                        "body": {
+                            "mode": "urlencoded",
+                            "urlencoded": [
+                                {
+                                    "key": "client_id",
+                                    "value": "{{client_id}}",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "username",
+                                    "value": "{{transportista_username}}",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "password",
+                                    "value": "{{transportista_password}}",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "grant_type",
+                                    "value": "password",
+                                    "type": "text"
+                                }
+                            ]
+                        },
+                        "url": {
+                            "raw": "{{keycloak_url}}/realms/{{realm}}/protocol/openid-connect/token",
+                            "host": [
+                                "{{keycloak_url}}"
+                            ],
+                            "path": [
+                                "realms",
+                                "{{realm}}",
+                                "protocol",
+                                "openid-connect",
+                                "token"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "[public] Refresh Token",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "if (pm.response.code === 200) {",
+                                    "    const jsonData = pm.response.json();",
+                                    "    pm.environment.set(\"access_token\", jsonData.access_token);",
+                                    "    pm.environment.set(\"refresh_token\", jsonData.refresh_token);",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [],
+                        "body": {
+                            "mode": "urlencoded",
+                            "urlencoded": [
+                                {
+                                    "key": "client_id",
+                                    "value": "{{client_id}}",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "refresh_token",
+                                    "value": "{{refresh_token}}",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "grant_type",
+                                    "value": "refresh_token",
+                                    "type": "text"
+                                }
+                            ]
+                        },
+                        "url": {
+                            "raw": "{{keycloak_url}}/realms/{{realm}}/protocol/openid-connect/token",
+                            "host": [
+                                "{{keycloak_url}}"
+                            ],
+                            "path": [
+                                "realms",
+                                "{{realm}}",
+                                "protocol",
+                                "openid-connect",
+                                "token"
+                            ]
+                        }
+                    },
+                    "response": []
+                }
+            ]
+        },
+        {
+            "name": "Solicitudes",
+            "item": [
+                {
+                    "name": "[CLIENTE] Crear Solicitud (CU-01)",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "if (pm.response.code === 201) {",
+                                    "    const jsonData = pm.response.json();",
+                                    "    pm.environment.set(\"solicitud_id\", jsonData.id);",
+                                    "    console.log(\"Solicitud creada con ID: \" + jsonData.id);",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"cliente\": {\n    \"nombre\": \"Juan Pérez\",\n    \"email\": \"cliente1@example.com\",\n    \"telefono\": \"+5491112345678\",\n    \"direccion\": \"Av. Corrientes 1234\"\n  },\n  \"contenedor\": {\n    \"numeroSerie\": \"CONT-001\",\n    \"tipo\": \"40HC\",\n    \"peso\": 1500.0,\n    \"volumen\": 67.5\n  },\n  \"origenDireccion\": \"Buenos Aires\",\n  \"origenLatitud\": -34.603722,\n  \"origenLongitud\": -58.381592,\n  \"destinoDireccion\": \"Rosario\",\n  \"destinoLatitud\": -32.944766,\n  \"destinoLongitud\": -60.650243\n}"
+                        },
+                        "url": {
+                            "raw": "{{gateway_url}}/solicitudes",
+                            "host": [
+                                "{{gateway_url}}"
+                            ],
+                            "path": [
+                                "solicitudes"
+                            ]
+                        },
+                        "description": "RF 1.1 y RF 1.2: Crea una solicitud con creación atómica de cliente y contenedor"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "[CLIENTE/ADMIN] Obtener Solicitud por ID (CU-02)",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{gateway_url}}/solicitudes/{{solicitud_id}}",
+                            "host": [
+                                "{{gateway_url}}"
+                            ],
+                            "path": [
+                                "solicitudes",
+                                "{{solicitud_id}}"
+                            ]
+                        },
+                        "description": "Consulta el estado de una solicitud de transporte"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "[ADMIN] Listar Todas las Solicitudes (ADMIN)",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{gateway_url}}/solicitudes",
+                            "host": [
+                                "{{gateway_url}}"
+                            ],
+                            "path": [
+                                "solicitudes"
+                            ]
+                        },
+                        "description": "Solo accesible para ADMIN"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "[CLIENTE/ADMIN] Solicitudes por Cliente",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{gateway_url}}/solicitudes/cliente/{{cliente_id}}",
+                            "host": [
+                                "{{gateway_url}}"
+                            ],
+                            "path": [
+                                "solicitudes",
+                                "cliente",
+                                "{{cliente_id}}"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "[ADMIN] Solicitudes Pendientes (CU-05)",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{gateway_url}}/solicitudes/pendientes",
+                            "host": [
+                                "{{gateway_url}}"
+                            ],
+                            "path": [
+                                "solicitudes",
+                                "pendientes"
+                            ]
+                        },
+                        "description": "Obtiene todas las solicitudes que no están entregadas"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "[ADMIN] Solicitudes por Estado",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{gateway_url}}/solicitudes/por-estado?estado=BORRADOR",
+                            "host": [
+                                "{{gateway_url}}"
+                            ],
+                            "path": [
+                                "solicitudes",
+                                "por-estado"
+                            ],
+                            "query": [
+                                {
+                                    "key": "estado",
+                                    "value": "BORRADOR",
+                                    "description": "BORRADOR, EN_PROCESO, ENTREGADA"
+                                }
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "[ADMIN] Asignar Ruta a Solicitud (CU-04)",
+                    "request": {
+                        "method": "PUT",
+                        "header": [],
+                        "url": {
+                            "raw": "{{gateway_url}}/solicitudes/{{solicitud_id}}/ruta/{{ruta_id}}",
+                            "host": [
+                                "{{gateway_url}}"
+                            ],
+                            "path": [
+                                "solicitudes",
+                                "{{solicitud_id}}",
+                                "ruta",
+                                "{{ruta_id}}"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "[ADMIN] Actualizar Estado Solicitud",
+                    "request": {
+                        "method": "PUT",
+                        "header": [],
+                        "url": {
+                            "raw": "{{gateway_url}}/solicitudes/{{solicitud_id}}/estado?nuevoEstado=EN_PROCESO",
+                            "host": [
+                                "{{gateway_url}}"
+                            ],
+                            "path": [
+                                "solicitudes",
+                                "{{solicitud_id}}",
+                                "estado"
+                            ],
+                            "query": [
+                                {
+                                    "key": "nuevoEstado",
+                                    "value": "EN_PROCESO"
+                                }
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "[ADMIN] Actualizar Estimaciones",
+                    "request": {
+                        "method": "PUT",
+                        "header": [],
+                        "url": {
+                            "raw": "{{gateway_url}}/solicitudes/{{solicitud_id}}/estimaciones?costoEstimado=25000&tiempoEstimadoHoras=48",
+                            "host": [
+                                "{{gateway_url}}"
+                            ],
+                            "path": [
+                                "solicitudes",
+                                "{{solicitud_id}}",
+                                "estimaciones"
+                            ],
+                            "query": [
+                                {
+                                    "key": "costoEstimado",
+                                    "value": "25000"
+                                },
+                                {
+                                    "key": "tiempoEstimadoHoras",
+                                    "value": "48"
+                                }
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "[ADMIN/CLIENTE] Calcular Costo Total de Entrega",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{gateway_url}}/solicitudes/{{solicitud_id}}/costo-total",
+                            "host": [
+                                "{{gateway_url}}"
+                            ],
+                            "path": [
+                                "solicitudes",
+                                "{{solicitud_id}}",
+                                "costo-total"
+                            ]
+                        },
+                        "description": "Calcula el costo total de la entrega incluyendo: recorrido total (distancia entre origen → depósitos y depósitos → destino), peso y volumen del contenedor, y estadía en depósitos (calculada a partir de la diferencia entre fechas reales de entrada y salida). (Operador/Administrador/Cliente)"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "[ADMIN] Listar Todas las Rutas (CU-03)",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{gateway_url}}/rutas",
+                            "host": [
+                                "{{gateway_url}}"
+                            ],
+                            "path": [
+                                "rutas"
+                            ]
+                        },
+                        "description": "Devuelve todas las rutas con sus tramos, tiempo y costo estimados (ADMIN)"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "[ADMIN] Obtener Ruta por ID",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{gateway_url}}/rutas/{{ruta_id}}",
+                            "host": [
+                                "{{gateway_url}}"
+                            ],
+                            "path": [
+                                "rutas",
+                                "{{ruta_id}}"
+                            ]
+                        },
+                        "description": "Consulta una ruta específica con todos sus tramos"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "[ADMIN] Crear Ruta Tentativa (CU-03)",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "if (pm.response.code === 201) {",
+                                    "    const jsonData = pm.response.json();",
+                                    "    pm.environment.set(\"ruta_id\", jsonData.id);",
+                                    "    console.log(\"Ruta creada con ID: \" + jsonData.id);",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"distanciaTotalKm\": 300.5,\n  \"tiempoEstimadoHoras\": 5.5,\n  \"costoEstimado\": 15000.0,\n  \"tramos\": [\n    {\n      \"origen\": \"Buenos Aires\",\n      \"destino\": \"Depósito Rosario\",\n      \"tipo\": \"ORIGEN_DEPOSITO\",\n      \"costoEstimado\": 8000.0\n    },\n    {\n      \"origen\": \"Depósito Rosario\",\n      \"destino\": \"Córdoba\",\n      \"tipo\": \"DEPOSITO_DESTINO\",\n      \"costoEstimado\": 7000.0\n    }\n  ]\n}"
+                        },
+                        "url": {
+                            "raw": "{{gateway_url}}/rutas",
+                            "host": [
+                                "{{gateway_url}}"
+                            ],
+                            "path": [
+                                "rutas"
+                            ]
+                        },
+                        "description": "Crea una ruta tentativa con sus tramos. Tipos de tramo válidos: ORIGEN_DESTINO, ORIGEN_DEPOSITO, DEPOSITO_DEPOSITO, DEPOSITO_DESTINO"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "[ADMIN] Crear Ruta para Solicitud (CU-04)",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "if (pm.response.code === 201) {",
+                                    "    const jsonData = pm.response.json();",
+                                    "    pm.environment.set(\"ruta_id\", jsonData.id);",
+                                    "    console.log(\"Ruta creada y asignada con ID: \" + jsonData.id);",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"distanciaTotalKm\": 250.0,\n  \"tiempoEstimadoHoras\": 4.0,\n  \"costoEstimado\": 12000.0,\n  \"tramos\": [\n    {\n      \"origen\": \"Buenos Aires\",\n      \"destino\": \"La Plata\",\n      \"tipo\": \"ORIGEN_DESTINO\",\n      \"costoEstimado\": 12000.0\n    }\n  ]\n}"
+                        },
+                        "url": {
+                            "raw": "{{gateway_url}}/rutas/solicitud/{{solicitud_id}}",
+                            "host": [
+                                "{{gateway_url}}"
+                            ],
+                            "path": [
+                                "rutas",
+                                "solicitud",
+                                "{{solicitud_id}}"
+                            ]
+                        },
+                        "description": "Crea una nueva ruta y la asigna automáticamente a una solicitud"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "[ADMIN] Actualizar Ruta",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"distanciaTotalKm\": 320.0,\n  \"tiempoEstimadoHoras\": 6.0,\n  \"costoEstimado\": 16000.0,\n  \"tramos\": []\n}"
+                        },
+                        "url": {
+                            "raw": "{{gateway_url}}/rutas/{{ruta_id}}",
+                            "host": [
+                                "{{gateway_url}}"
+                            ],
+                            "path": [
+                                "rutas",
+                                "{{ruta_id}}"
+                            ]
+                        },
+                        "description": "Actualiza los datos generales de una ruta. No se pueden actualizar rutas con tramos en proceso."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "[ADMIN] Eliminar Ruta",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [],
+                        "url": {
+                            "raw": "{{gateway_url}}/rutas/{{ruta_id}}",
+                            "host": [
+                                "{{gateway_url}}"
+                            ],
+                            "path": [
+                                "rutas",
+                                "{{ruta_id}}"
+                            ]
+                        },
+                        "description": "Elimina una ruta. Solo se pueden eliminar rutas no asignadas a solicitudes."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "[ADMIN/TRANSPORTISTA] Obtener Progreso de Ruta",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{gateway_url}}/rutas/{{ruta_id}}/progreso",
+                            "host": [
+                                "{{gateway_url}}"
+                            ],
+                            "path": [
+                                "rutas",
+                                "{{ruta_id}}",
+                                "progreso"
+                            ]
+                        },
+                        "description": "Consulta el progreso de ejecución de una ruta (tramos completados, en proceso, etc.)"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "[ADMIN] Recalcular Métricas de Ruta",
+                    "request": {
+                        "method": "POST",
+                        "header": [],
+                        "url": {
+                            "raw": "{{gateway_url}}/rutas/{{ruta_id}}/recalcular",
+                            "host": [
+                                "{{gateway_url}}"
+                            ],
+                            "path": [
+                                "rutas",
+                                "{{ruta_id}}",
+                                "recalcular"
+                            ]
+                        },
+                        "description": "Recalcula el costo estimado total basándose en los costos de los tramos"
+                    },
+                    "response": []
+                }
+            ]
+        },
+        {
+            "name": "Tramos",
+            "item": [
+                {
+                    "name": "[TRANSPORTISTA/ADMIN] Registrar Inicio de Tramo (CU-07)",
+                    "request": {
+                        "method": "POST",
+                        "header": [],
+                        "url": {
+                            "raw": "{{gateway_url}}/solicitudes/tramos/{{tramo_id}}/inicio",
+                            "host": [
+                                "{{gateway_url}}"
+                            ],
+                            "path": [
+                                "solicitudes",
+                                "tramos",
+                                "{{tramo_id}}",
+                                "inicio"
+                            ]
+                        },
+                        "description": "TRANSPORTISTA registra el inicio de un tramo"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "[TRANSPORTISTA/ADMIN] Registrar Fin de Tramo (CU-08)",
+                    "request": {
+                        "method": "POST",
+                        "header": [],
+                        "url": {
+                            "raw": "{{gateway_url}}/solicitudes/tramos/{{tramo_id}}/fin",
+                            "host": [
+                                "{{gateway_url}}"
+                            ],
+                            "path": [
+                                "solicitudes",
+                                "tramos",
+                                "{{tramo_id}}",
+                                "fin"
+                            ]
+                        },
+                        "description": "TRANSPORTISTA registra el fin de un tramo"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "[ADMIN] Asignar Camión a Tramo (CU-06)",
+                    "request": {
+                        "method": "PUT",
+                        "header": [],
+                        "url": {
+                            "raw": "{{gateway_url}}/tramos/{{tramo_id}}/asignar-camion/{{camion_id}}",
+                            "host": [
+                                "{{gateway_url}}"
+                            ],
+                            "path": [
+                                "tramos",
+                                "{{tramo_id}}",
+                                "asignar-camion",
+                                "{{camion_id}}"
+                            ]
+                        },
+                        "description": "Asigna un camión específico a un tramo de traslado. El tramo debe estar en estado ESTIMADO. (Operador/Administrador)"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "[ADMIN/TRANSPORTISTA] Obtener Tramo por ID",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{gateway_url}}/tramos/{{tramo_id}}",
+                            "host": [
+                                "{{gateway_url}}"
+                            ],
+                            "path": [
+                                "tramos",
+                                "{{tramo_id}}"
+                            ]
+                        },
+                        "description": "Consulta un tramo específico por su identificador"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "[ADMIN/TRANSPORTISTA] Tramos por Camión",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{gateway_url}}/tramos/camion/{{camion_id}}",
+                            "host": [
+                                "{{gateway_url}}"
+                            ],
+                            "path": [
+                                "tramos",
+                                "camion",
+                                "{{camion_id}}"
+                            ]
+                        },
+                        "description": "Lista todos los tramos asignados a un camión específico. Útil para transportistas ver sus asignaciones."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "[ADMIN/TRANSPORTISTA] Tramos por Estado",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{gateway_url}}/tramos/estado/INICIADO",
+                            "host": [
+                                "{{gateway_url}}"
+                            ],
+                            "path": [
+                                "tramos",
+                                "estado",
+                                "INICIADO"
+                            ]
+                        },
+                        "description": "Lista tramos filtrados por estado. Estados válidos: ESTIMADO, ASIGNADO, INICIADO, FINALIZADO"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "[ADMIN/TRANSPORTISTA] Iniciar Tramo (alternativo)",
+                    "request": {
+                        "method": "POST",
+                        "header": [],
+                        "url": {
+                            "raw": "{{gateway_url}}/tramos/{{tramo_id}}/iniciar",
+                            "host": [
+                                "{{gateway_url}}"
+                            ],
+                            "path": [
+                                "tramos",
+                                "{{tramo_id}}",
+                                "iniciar"
+                            ]
+                        },
+                        "description": "Endpoint alternativo para iniciar tramo (CU-07). También disponible en /solicitudes/tramos/{id}/inicio"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "[ADMIN/TRANSPORTISTA] Finalizar Tramo (alternativo)",
+                    "request": {
+                        "method": "POST",
+                        "header": [],
+                        "url": {
+                            "raw": "{{gateway_url}}/tramos/{{tramo_id}}/finalizar",
+                            "host": [
+                                "{{gateway_url}}"
+                            ],
+                            "path": [
+                                "tramos",
+                                "{{tramo_id}}",
+                                "finalizar"
+                            ]
+                        },
+                        "description": "Endpoint alternativo para finalizar tramo (CU-08). También disponible en /solicitudes/tramos/{id}/fin"
+                    },
+                    "response": []
+                }
+            ]
+        },
+        {
+            "name": "Clientes",
+            "item": [
+                {
+                    "name": "[ADMIN] Crear Cliente",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "if (pm.response.code === 201) {",
+                                    "    const jsonData = pm.response.json();",
+                                    "    pm.environment.set(\"cliente_id\", jsonData.id);",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"nombre\": \"María González\",\n  \"email\": \"maria.gonzalez@example.com\",\n  \"telefono\": \"+5491123456789\",\n  \"direccion\": \"Av. Santa Fe 2500\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{gateway_url}}/clientes",
+                            "host": [
+                                "{{gateway_url}}"
+                            ],
+                            "path": [
+                                "clientes"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "[CLIENTE/ADMIN] Obtener Cliente por ID",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{gateway_url}}/clientes/{{cliente_id}}",
+                            "host": [
+                                "{{gateway_url}}"
+                            ],
+                            "path": [
+                                "clientes",
+                                "{{cliente_id}}"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "[ADMIN] Listar Todos los Clientes",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{gateway_url}}/clientes",
+                            "host": [
+                                "{{gateway_url}}"
+                            ],
+                            "path": [
+                                "clientes"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "[ADMIN] Buscar Cliente por Email",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{gateway_url}}/clientes/email/cliente1@example.com",
+                            "host": [
+                                "{{gateway_url}}"
+                            ],
+                            "path": [
+                                "clientes",
+                                "email",
+                                "cliente1@example.com"
+                            ]
+                        }
+                    },
+                    "response": []
+                }
+            ]
+        },
+        {
+            "name": "Contenedores",
+            "item": [
+                {
+                    "name": "[ADMIN] Crear Contenedor",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "if (pm.response.code === 201) {",
+                                    "    const jsonData = pm.response.json();",
+                                    "    pm.environment.set(\"contenedor_id\", jsonData.id);",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"numeroSerie\": \"CONT-002\",\n  \"tipo\": \"20DV\",\n  \"peso\": 800.0,\n  \"volumen\": 33.2,\n  \"clienteId\": {{cliente_id}}\n}"
+                        },
+                        "url": {
+                            "raw": "{{gateway_url}}/contenedores",
+                            "host": [
+                                "{{gateway_url}}"
+                            ],
+                            "path": [
+                                "contenedores"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "[ADMIN/TRANSPORTISTA] Obtener Contenedor por ID",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{gateway_url}}/contenedores/{{contenedor_id}}",
+                            "host": [
+                                "{{gateway_url}}"
+                            ],
+                            "path": [
+                                "contenedores",
+                                "{{contenedor_id}}"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Buscar Contenedor por Número de Serie",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{gateway_url}}/contenedores/serie/CONT-001",
+                            "host": [
+                                "{{gateway_url}}"
+                            ],
+                            "path": [
+                                "contenedores",
+                                "serie",
+                                "CONT-001"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "[ADMIN] Contenedores por Cliente",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{gateway_url}}/contenedores/cliente/{{cliente_id}}",
+                            "host": [
+                                "{{gateway_url}}"
+                            ],
+                            "path": [
+                                "contenedores",
+                                "cliente",
+                                "{{cliente_id}}"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "[ADMIN/TRANSPORTISTA] Contenedores por Estado",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{gateway_url}}/contenedores/estado?estado=REGISTRADO",
+                            "host": [
+                                "{{gateway_url}}"
+                            ],
+                            "path": [
+                                "contenedores",
+                                "estado"
+                            ],
+                            "query": [
+                                {
+                                    "key": "estado",
+                                    "value": "REGISTRADO",
+                                    "description": "REGISTRADO, LISTO_PARA_RETIRO, EN_TRASLADO, EN_DEPOSITO, ENTREGADO"
+                                }
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "[ADMIN/TRANSPORTISTA] Consultar Contenedores Pendientes",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{gateway_url}}/contenedores/pendientes",
+                            "host": [
+                                "{{gateway_url}}"
+                            ],
+                            "path": [
+                                "contenedores",
+                                "pendientes"
+                            ]
+                        },
+                        "description": "Obtiene todos los contenedores que NO están en estado ENTREGADO, con información de estado y ubicación actual. (Operador/Administrador)"
+                    },
+                    "response": []
+                }
+            ]
+        },
+        {
+            "name": "Flota",
+            "item": [
+                {
+                    "name": "[ADMIN/TRANSPORTISTA] Listar Camiones",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{gateway_url}}/flota/camiones",
+                            "host": [
+                                "{{gateway_url}}"
+                            ],
+                            "path": [
+                                "flota",
+                                "camiones"
+                            ]
+                        },
+                        "description": "Accesible por ADMIN y TRANSPORTISTA"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Obtener Camión por ID",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{gateway_url}}/flota/camiones/{{camion_id}}",
+                            "host": [
+                                "{{gateway_url}}"
+                            ],
+                            "path": [
+                                "flota",
+                                "camiones",
+                                "{{camion_id}}"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Listar Depósitos",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{gateway_url}}/flota/depositos",
+                            "host": [
+                                "{{gateway_url}}"
+                            ],
+                            "path": [
+                                "flota",
+                                "depositos"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Obtener Depósito por ID",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{gateway_url}}/flota/depositos/{{deposito_id}}",
+                            "host": [
+                                "{{gateway_url}}"
+                            ],
+                            "path": [
+                                "flota",
+                                "depositos",
+                                "{{deposito_id}}"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "[ADMIN] Crear Cami?n",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"dominio\": \"ABC123\",\n  \"nombreTransportista\": \"Juan Perez\",\n  \"telefono\": \"+541112345678\",\n  \"capacidadPesoKg\": 10000,\n  \"capacidadVolumenM3\": 60,\n  \"consumoCombustibleLitrosKm\": 0.35,\n  \"costoBaseKm\": 120\n}"
+                        },
+                        "url": {
+                            "raw": "{{gateway_url}}/flota/camiones",
+                            "host": [
+                                "{{gateway_url}}"
+                            ],
+                            "path": [
+                                "flota",
+                                "camiones"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "[ADMIN] Actualizar Cami?n",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"dominio\": \"ABC123\",\n  \"nombreTransportista\": \"Juan Perez\",\n  \"telefono\": \"+541112345678\",\n  \"capacidadPesoKg\": 10500,\n  \"capacidadVolumenM3\": 62,\n  \"consumoCombustibleLitrosKm\": 0.34,\n  \"costoBaseKm\": 125\n}"
+                        },
+                        "url": {
+                            "raw": "{{gateway_url}}/flota/camiones/{{camion_id}}",
+                            "host": [
+                                "{{gateway_url}}"
+                            ],
+                            "path": [
+                                "flota",
+                                "camiones",
+                                "{{camion_id}}"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "[ADMIN] Eliminar Cami?n",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [],
+                        "url": {
+                            "raw": "{{gateway_url}}/flota/camiones/{{camion_id}}",
+                            "host": [
+                                "{{gateway_url}}"
+                            ],
+                            "path": [
+                                "flota",
+                                "camiones",
+                                "{{camion_id}}"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "[ADMIN] Crear Dep?sito",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"nombre\": \"Dep?sito Central\",\n  \"direccion\": \"Av Siempre Viva 742\",\n  \"latitud\": -34.60,\n  \"longitud\": -58.38,\n  \"costoEstadiaDiaria\": 5000\n}"
+                        },
+                        "url": {
+                            "raw": "{{gateway_url}}/flota/depositos",
+                            "host": [
+                                "{{gateway_url}}"
+                            ],
+                            "path": [
+                                "flota",
+                                "depositos"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "[ADMIN] Actualizar Dep?sito",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"nombre\": \"Dep?sito Central\",\n  \"direccion\": \"Av Siempre Viva 742\",\n  \"latitud\": -34.61,\n  \"longitud\": -58.39,\n  \"costoEstadiaDiaria\": 5200\n}"
+                        },
+                        "url": {
+                            "raw": "{{gateway_url}}/flota/depositos/{{deposito_id}}",
+                            "host": [
+                                "{{gateway_url}}"
+                            ],
+                            "path": [
+                                "flota",
+                                "depositos",
+                                "{{deposito_id}}"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "[ADMIN] Eliminar Dep?sito",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [],
+                        "url": {
+                            "raw": "{{gateway_url}}/flota/depositos/{{deposito_id}}",
+                            "host": [
+                                "{{gateway_url}}"
+                            ],
+                            "path": [
+                                "flota",
+                                "depositos",
+                                "{{deposito_id}}"
+                            ]
+                        }
+                    },
+                    "response": []
+                }
+            ]
+        },
+        {
+            "name": "Costos",
+            "item": [
+                {
+                    "name": "[ADMIN] Listar Tarifas",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{gateway_url}}/costos/tarifas",
+                            "host": [
+                                "{{gateway_url}}"
+                            ],
+                            "path": [
+                                "costos",
+                                "tarifas"
+                            ]
+                        },
+                        "description": "Accesible por ADMIN y CLIENTE"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "[ADMIN] Obtener Tarifa por ID",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{gateway_url}}/costos/tarifas/{{tarifa_id}}",
+                            "host": [
+                                "{{gateway_url}}"
+                            ],
+                            "path": [
+                                "costos",
+                                "tarifas",
+                                "{{tarifa_id}}"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "[ADMIN] Crear Tarifa",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"nombre\": \"Tarifa Base\",\n  \"costoBaseKm\": 120,\n  \"valorCombustibleLitro\": 900,\n  \"costoEstadiaDiaria\": 6000,\n  \"velocidadPromedioKmH\": 70,\n  \"costoGestionFijo\": 3000\n}"
+                        },
+                        "url": {
+                            "raw": "{{gateway_url}}/costos/tarifas",
+                            "host": [
+                                "{{gateway_url}}"
+                            ],
+                            "path": [
+                                "costos",
+                                "tarifas"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "[ADMIN] Actualizar Tarifa",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"nombre\": \"Tarifa Base\",\n  \"costoBaseKm\": 130,\n  \"valorCombustibleLitro\": 950,\n  \"costoEstadiaDiaria\": 6200,\n  \"velocidadPromedioKmH\": 72,\n  \"costoGestionFijo\": 3200\n}"
+                        },
+                        "url": {
+                            "raw": "{{gateway_url}}/costos/tarifas/{{tarifa_id}}",
+                            "host": [
+                                "{{gateway_url}}"
+                            ],
+                            "path": [
+                                "costos",
+                                "tarifas",
+                                "{{tarifa_id}}"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "[ADMIN] Eliminar Tarifa",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [],
+                        "url": {
+                            "raw": "{{gateway_url}}/costos/tarifas/{{tarifa_id}}",
+                            "host": [
+                                "{{gateway_url}}"
+                            ],
+                            "path": [
+                                "costos",
+                                "tarifas",
+                                "{{tarifa_id}}"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "[ADMIN/CLIENTE] Estimar Costo y Tiempo (distancia conocida)",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"distanciaKm\": 450,\n  \"pesoKg\": 1200,\n  \"volumenM3\": 40,\n  \"consumoCamionLitrosKm\": 0.35,\n  \"diasEstadia\": 1,\n  \"costoEstadiaDiaria\": 5000,\n  \"tarifaId\": null\n}"
+                        },
+                        "url": {
+                            "raw": "{{gateway_url}}/costos/tarifas/estimacion",
+                            "host": [
+                                "{{gateway_url}}"
+                            ],
+                            "path": [
+                                "costos",
+                                "tarifas",
+                                "estimacion"
+                            ]
+                        },
+                        "description": "Calcula costo/tiempo usando distancia ya calculada (ADMIN/CLIENTE)"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "[ADMIN/CLIENTE] Estimar Costo y Tiempo (geolocalizaci?n)",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"origenLat\": -34.603722,\n  \"origenLng\": -58.381592,\n  \"destinoLat\": -31.420083,\n  \"destinoLng\": -64.188776,\n  \"pesoKg\": 1200,\n  \"volumenM3\": 40,\n  \"consumoCamionLitrosKm\": 0.35,\n  \"diasEstadia\": 1,\n  \"costoEstadiaDiaria\": 5000,\n  \"tarifaId\": null\n}"
+                        },
+                        "url": {
+                            "raw": "{{gateway_url}}/costos/tarifas/estimacion/geoloc",
+                            "host": [
+                                "{{gateway_url}}"
+                            ],
+                            "path": [
+                                "costos",
+                                "tarifas",
+                                "estimacion",
+                                "geoloc"
+                            ]
+                        },
+                        "description": "Calcula costo/tiempo usando distancia Google Maps (ADMIN/CLIENTE)"
+                    },
+                    "response": []
+                }
+            ]
+        },
+        {
+            "name": "Health & Actuator",
+            "item": [
+                {
+                    "name": "[public] Health Check",
+                    "request": {
+                        "auth": {
+                            "type": "noauth"
+                        },
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{gateway_url}}/actuator/health",
+                            "host": [
+                                "{{gateway_url}}"
+                            ],
+                            "path": [
+                                "actuator",
+                                "health"
+                            ]
+                        },
+                        "description": "Endpoint público para verificar el estado del sistema"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "[public] Info",
+                    "request": {
+                        "auth": {
+                            "type": "noauth"
+                        },
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{gateway_url}}/actuator/info",
+                            "host": [
+                                "{{gateway_url}}"
+                            ],
+                            "path": [
+                                "actuator",
+                                "info"
+                            ]
+                        }
+                    },
+                    "response": []
+                }
+            ]
+        }
+    ]
 }

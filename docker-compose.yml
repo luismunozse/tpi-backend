@@ -11,6 +11,7 @@ services:
         environment:
             - KEYCLOAK_ADMIN=admin
             - KEYCLOAK_ADMIN_PASSWORD=admin123
+            - KEYCLOAK_FRONTEND_URL=http://host.docker.internal:9090
         volumes:
             - keycloak_data:/opt/keycloak/data
         networks:
@@ -85,11 +86,14 @@ services:
             dockerfile: Dockerfile
         container_name: solicitudes-service
         restart: unless-stopped
+        extra_hosts:
+            - "host.docker.internal:host-gateway"
         environment:
             - SPRING_DATASOURCE_URL=jdbc:postgresql://solicitudes-db:5432/solicitudes_db
             - SPRING_DATASOURCE_USERNAME=solicitudes_user
             - SPRING_DATASOURCE_PASSWORD=solicitudes_password
-            - SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI=http://keycloak:8080/realms/tpi-backend
+            - KEYCLOAK_ISSUER_URI=http://host.docker.internal:9090/realms/tpi-backend # Permite apuntar a localhost o al contenedor keycloak dentro de docker-compose
+            - SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI=http://keycloak:8080/realms/tpi-backend/protocol/openid-connect/certs
         depends_on:
             solicitudes-db:
                 condition: service_healthy
@@ -104,11 +108,14 @@ services:
             dockerfile: Dockerfile
         container_name: flota-service
         restart: unless-stopped
+        extra_hosts:
+            - "host.docker.internal:host-gateway"
         environment:
             - SPRING_DATASOURCE_URL=jdbc:postgresql://flota-db:5432/flota_db
             - SPRING_DATASOURCE_USERNAME=flota_user
             - SPRING_DATASOURCE_PASSWORD=flota_password
-            - SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI=http://keycloak:8080/realms/tpi-backend
+            - KEYCLOAK_ISSUER_URI=http://host.docker.internal:9090/realms/tpi-backend
+            - SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI=http://keycloak:8080/realms/tpi-backend/protocol/openid-connect/certs
         depends_on:
             flota-db:
                 condition: service_healthy
@@ -123,11 +130,14 @@ services:
             dockerfile: Dockerfile
         container_name: costos-service
         restart: unless-stopped
+        extra_hosts:
+            - "host.docker.internal:host-gateway"
         environment:
             - SPRING_DATASOURCE_URL=jdbc:postgresql://costos-db:5432/costos_db
             - SPRING_DATASOURCE_USERNAME=costos_user
             - SPRING_DATASOURCE_PASSWORD=costos_password
-            - SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI=http://keycloak:8080/realms/tpi-backend
+            - KEYCLOAK_ISSUER_URI=http://host.docker.internal:9090/realms/tpi-backend
+            - SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI=http://keycloak:8080/realms/tpi-backend/protocol/openid-connect/certs
             - GOOGLE_MAPS_API_KEY=${GOOGLE_MAPS_API_KEY}
         depends_on:
             costos-db:
@@ -145,8 +155,12 @@ services:
         restart: unless-stopped
         ports:
             - 8080:8080
+        extra_hosts:
+            - "host.docker.internal:host-gateway"
         environment:
-            - SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI=http://keycloak:8080/realms/tpi-backend
+            - KEYCLOAK_ISSUER_URI=http://host.docker.internal:9090/realms/tpi-backend
+            - SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI=http://keycloak:8080/realms/tpi-backend/protocol/openid-connect/certs
+            - KEYCLOAK_JWK_SET_URI=http://keycloak:8080/realms/tpi-backend/protocol/openid-connect/certs
             - TPI_GATEWAY_SOLICITUDES_SERVICE_URL=http://solicitudes-service:8081
             - TPI_GATEWAY_FLOTA_SERVICE_URL=http://flota-service:8082
             - TPI_GATEWAY_COSTOS_SERVICE_URL=http://costos-service:8083

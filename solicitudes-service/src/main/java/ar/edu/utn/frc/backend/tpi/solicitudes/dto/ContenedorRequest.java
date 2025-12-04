@@ -33,6 +33,6 @@ public class ContenedorRequest {
     @DecimalMin(value = "0.1", message = "El volumen debe ser mayor a 0")
     private Double volumen;
 
-    @NotNull(message = "El ID del cliente es obligatorio")
+    // Se setea internamente tras crear/obtener el cliente asociado; puede venir nulo en el request.
     private Long clienteId;
 }

@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import ar.edu.utn.frc.backend.tpi.solicitudes.dto.SolicitudRequest;
 import ar.edu.utn.frc.backend.tpi.solicitudes.dto.SolicitudResponse;
 import ar.edu.utn.frc.backend.tpi.solicitudes.entity.EstadoSolicitud;
+import ar.edu.utn.frc.backend.tpi.solicitudes.service.CostoSolicitudService;
 import ar.edu.utn.frc.backend.tpi.solicitudes.service.SolicitudService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -48,6 +49,7 @@ import lombok.extern.slf4j.Slf4j;
 public class SolicitudController {
 
     private final SolicitudService solicitudService;
+    private final CostoSolicitudService costoSolicitudService;
 
     @PostMapping
     @PreAuthorize("hasAnyRole('CLIENTE', 'ADMIN')")
@@ -258,5 +260,27 @@ public class SolicitudController {
         SolicitudResponse response = solicitudService.actualizarEstimaciones(
                 solicitudId, costoEstimado, tiempoEstimadoHoras);
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/{solicitudId}/costo-total")
+    @PreAuthorize("hasAnyRole('ADMIN', 'CLIENTE')")
+    @Operation(summary = "Calcular costo total de entrega",
+               description = "Calcula el costo total de la entrega incluyendo: " +
+                             "recorrido total (distancia entre origen → depósitos y depósitos → destino), " +
+                             "peso y volumen del contenedor, " +
+                             "y estadía en depósitos (calculada a partir de la diferencia entre fechas reales de entrada y salida). " +
+                             "(Operador/Administrador/Cliente)")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Costo total calculado",
+                     content = @Content(schema = @Schema(implementation = CostoSolicitudService.DesgloseCostoTotal.class))),
+        @ApiResponse(responseCode = "404", description = "Solicitud no encontrada o sin ruta asignada"),
+        @ApiResponse(responseCode = "401", description = "No autorizado")
+    })
+    public ResponseEntity<CostoSolicitudService.DesgloseCostoTotal> calcularCostoTotal(
+            @Parameter(description = "ID de la solicitud") @PathVariable Long solicitudId) {
+
+        log.info("REST: Calculando costo total de solicitud {}", solicitudId);
+        CostoSolicitudService.DesgloseCostoTotal desglose = costoSolicitudService.calcularCostoTotal(solicitudId);
+        return ResponseEntity.ok(desglose);
     }
 }
