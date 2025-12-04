@@ -32,9 +32,9 @@ public class Solicitud {
     @ManyToOne(optional = false)
     @JoinColumn(name = "cliente_id", nullable = false)
     private Cliente cliente; //Cliente que realiza la solicitud
-    @OneToOne(optional = false)
-    @JoinColumn(name = "contenedor_id", nullable = false, unique = true)
-    private Contenedor contenedor; //Contenedor a trasladar
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "contenedor_id", nullable = false)
+    private Contenedor contenedor; //Contenedor a trasladar (permite reusar contenedor en nuevas solicitudes)
     @OneToOne
     @JoinColumn(name = "ruta_id")
     private Ruta ruta; // Ruta asignada a la solicitud puede ser nula si no fue asignada aún

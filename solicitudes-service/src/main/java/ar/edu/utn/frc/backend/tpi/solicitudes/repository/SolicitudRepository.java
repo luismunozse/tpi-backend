@@ -14,4 +14,6 @@ public interface SolicitudRepository extends JpaRepository<Solicitud, Long> {
     List<Solicitud> findByEstado(EstadoSolicitud estado);
 
     List<Solicitud> findByEstadoNot(EstadoSolicitud estado);
+
+    List<Solicitud> findByContenedorIdAndEstadoNot(Long contenedorId, EstadoSolicitud estado);
 }

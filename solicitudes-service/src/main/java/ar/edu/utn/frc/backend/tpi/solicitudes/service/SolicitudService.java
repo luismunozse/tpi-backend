@@ -110,6 +110,15 @@ public class SolicitudService {
                 .orElseThrow(() -> new IllegalStateException(
                         "Error al obtener contenedor recién creado con id: " + contenedorResponse.getId()));
 
+        // Evitar solicitudes duplicadas para un contenedor que aun no fue entregado
+        List<Solicitud> solicitudesActivas = solicitudRepository.findByContenedorIdAndEstadoNot(
+                contenedor.getId(), EstadoSolicitud.ENTREGADA);
+        if (!solicitudesActivas.isEmpty()) {
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT,
+                    "Ya existe una solicitud activa para el contenedor " + contenedor.getNumeroSerie());
+        }
+
         // Crear la solicitud con las entidades obtenidas/creadas
         Solicitud solicitud = Solicitud.builder()
                 .cliente(cliente)
