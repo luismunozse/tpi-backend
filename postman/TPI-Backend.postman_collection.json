@@ -978,6 +978,106 @@
                         }
                     },
                     "response": []
+                },
+                {
+                    "name": "[ADMIN] Buscar Clientes por Nombre",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{gateway_url}}/clientes/buscar?nombre=María",
+                            "host": [
+                                "{{gateway_url}}"
+                            ],
+                            "path": [
+                                "clientes",
+                                "buscar"
+                            ],
+                            "query": [
+                                {
+                                    "key": "nombre",
+                                    "value": "María"
+                                }
+                            ]
+                        },
+                        "description": "Búsqueda parcial de clientes por nombre"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "[ADMIN/CLIENTE] Actualizar Cliente",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"nombre\": \"María González\",\n  \"email\": \"maria.gonzalez@example.com\",\n  \"telefono\": \"+5491123456789\",\n  \"direccion\": \"Av. Santa Fe 2600\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{gateway_url}}/clientes/{{cliente_id}}",
+                            "host": [
+                                "{{gateway_url}}"
+                            ],
+                            "path": [
+                                "clientes",
+                                "{{cliente_id}}"
+                            ]
+                        },
+                        "description": "Actualiza los datos de un cliente existente"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "[ADMIN] Eliminar Cliente",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [],
+                        "url": {
+                            "raw": "{{gateway_url}}/clientes/{{cliente_id}}",
+                            "host": [
+                                "{{gateway_url}}"
+                            ],
+                            "path": [
+                                "clientes",
+                                "{{cliente_id}}"
+                            ]
+                        },
+                        "description": "Elimina un cliente del sistema (solo si no tiene solicitudes)"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "[CLIENTE/ADMIN] Obtener o Crear Cliente",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"nombre\": \"Juan Pérez\",\n  \"email\": \"juan.perez@example.com\",\n  \"telefono\": \"+5491198765432\",\n  \"direccion\": \"Av. Corrientes 1234\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{gateway_url}}/clientes/obtener-o-crear",
+                            "host": [
+                                "{{gateway_url}}"
+                            ],
+                            "path": [
+                                "clientes",
+                                "obtener-o-crear"
+                            ]
+                        },
+                        "description": "Retorna el cliente si existe, o lo crea si no existe"
+                    },
+                    "response": []
                 }
             ]
         },
@@ -1144,7 +1244,39 @@
                                 "camiones"
                             ]
                         },
-                        "description": "Accesible por ADMIN y TRANSPORTISTA"
+                        "description": "Accesible por ADMIN y TRANSPORTISTA. Puede filtrar por estado usando ?estado=DISPONIBLE"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "[ADMIN/TRANSPORTISTA] Listar Camiones Disponibles por Capacidad",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{gateway_url}}/flota/camiones/disponibles?pesoKg=5000&volumenM3=30",
+                            "host": [
+                                "{{gateway_url}}"
+                            ],
+                            "path": [
+                                "flota",
+                                "camiones",
+                                "disponibles"
+                            ],
+                            "query": [
+                                {
+                                    "key": "pesoKg",
+                                    "value": "5000",
+                                    "description": "Peso mínimo en kg (opcional)"
+                                },
+                                {
+                                    "key": "volumenM3",
+                                    "value": "30",
+                                    "description": "Volumen mínimo en m3 (opcional)"
+                                }
+                            ]
+                        },
+                        "description": "Filtra camiones disponibles por capacidad de peso y volumen"
                     },
                     "response": []
                 },
@@ -1216,7 +1348,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\n  \"dominio\": \"ABC123\",\n  \"nombreTransportista\": \"Juan Perez\",\n  \"telefono\": \"+541112345678\",\n  \"capacidadPesoKg\": 10000,\n  \"capacidadVolumenM3\": 60,\n  \"consumoCombustibleLitrosKm\": 0.35,\n  \"costoBaseKm\": 120\n}"
+                            "raw": "{\n  \"dominio\": \"ABC123\",\n  \"transportistaId\": 1,\n  \"capacidadPesoKg\": 10000,\n  \"capacidadVolumenM3\": 60,\n  \"consumoCombustibleLitrosKm\": 0.35,\n  \"costoBaseKm\": 120\n}"
                         },
                         "url": {
                             "raw": "{{gateway_url}}/flota/camiones",
@@ -1227,7 +1359,8 @@
                                 "flota",
                                 "camiones"
                             ]
-                        }
+                        },
+                        "description": "Crear camión requiere un transportista existente. Use el ID del transportista creado previamente."
                     },
                     "response": []
                 },
@@ -1243,7 +1376,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\n  \"dominio\": \"ABC123\",\n  \"nombreTransportista\": \"Juan Perez\",\n  \"telefono\": \"+541112345678\",\n  \"capacidadPesoKg\": 10500,\n  \"capacidadVolumenM3\": 62,\n  \"consumoCombustibleLitrosKm\": 0.34,\n  \"costoBaseKm\": 125\n}"
+                            "raw": "{\n  \"dominio\": \"ABC123\",\n  \"transportistaId\": 1,\n  \"capacidadPesoKg\": 10500,\n  \"capacidadVolumenM3\": 62,\n  \"consumoCombustibleLitrosKm\": 0.34,\n  \"costoBaseKm\": 125\n}"
                         },
                         "url": {
                             "raw": "{{gateway_url}}/flota/camiones/{{camion_id}}",
@@ -1255,7 +1388,59 @@
                                 "camiones",
                                 "{{camion_id}}"
                             ]
-                        }
+                        },
+                        "description": "Actualizar camión. Puede cambiar el transportista asignado especificando un nuevo transportistaId."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "[ADMIN/TRANSPORTISTA] Asignar Camión",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"pesoKg\": 5000,\n  \"volumenM3\": 30\n}"
+                        },
+                        "url": {
+                            "raw": "{{gateway_url}}/flota/camiones/{{camion_id}}/asignar",
+                            "host": [
+                                "{{gateway_url}}"
+                            ],
+                            "path": [
+                                "flota",
+                                "camiones",
+                                "{{camion_id}}",
+                                "asignar"
+                            ]
+                        },
+                        "description": "Marca camión como ocupado validando capacidad"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "[ADMIN/TRANSPORTISTA] Liberar Camión",
+                    "request": {
+                        "method": "POST",
+                        "header": [],
+                        "url": {
+                            "raw": "{{gateway_url}}/flota/camiones/{{camion_id}}/liberar",
+                            "host": [
+                                "{{gateway_url}}"
+                            ],
+                            "path": [
+                                "flota",
+                                "camiones",
+                                "{{camion_id}}",
+                                "liberar"
+                            ]
+                        },
+                        "description": "Marca camión como disponible"
                     },
                     "response": []
                 },
@@ -1349,6 +1534,206 @@
                                 "{{deposito_id}}"
                             ]
                         }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "[ADMIN/TRANSPORTISTA] Listar Transportistas",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{gateway_url}}/flota/transportistas",
+                            "host": [
+                                "{{gateway_url}}"
+                            ],
+                            "path": [
+                                "flota",
+                                "transportistas"
+                            ]
+                        },
+                        "description": "Obtiene todos los transportistas del sistema"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "[ADMIN/TRANSPORTISTA] Obtener Transportista por ID",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{gateway_url}}/flota/transportistas/{{transportista_id}}",
+                            "host": [
+                                "{{gateway_url}}"
+                            ],
+                            "path": [
+                                "flota",
+                                "transportistas",
+                                "{{transportista_id}}"
+                            ]
+                        },
+                        "description": "Consulta un transportista específico por su identificador"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "[ADMIN/TRANSPORTISTA] Buscar Transportista por DNI",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{gateway_url}}/flota/transportistas/dni/{{dni}}",
+                            "host": [
+                                "{{gateway_url}}"
+                            ],
+                            "path": [
+                                "flota",
+                                "transportistas",
+                                "dni",
+                                "{{dni}}"
+                            ]
+                        },
+                        "description": "Consulta un transportista por su número de DNI"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "[ADMIN] Listar Transportistas por Estado",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{gateway_url}}/flota/transportistas/estado/true",
+                            "host": [
+                                "{{gateway_url}}"
+                            ],
+                            "path": [
+                                "flota",
+                                "transportistas",
+                                "estado",
+                                "true"
+                            ]
+                        },
+                        "description": "Obtiene todos los transportistas activos o inactivos (true para activos, false para inactivos)"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "[ADMIN] Crear Transportista",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"nombre\": \"Juan\",\n  \"apellido\": \"Perez\",\n  \"dni\": \"12345678\",\n  \"email\": \"juan.perez@example.com\",\n  \"telefono\": \"+541112345678\",\n  \"numeroLicencia\": \"B1234567\",\n  \"categoriaLicencia\": \"C\",\n  \"activo\": true\n}"
+                        },
+                        "url": {
+                            "raw": "{{gateway_url}}/flota/transportistas",
+                            "host": [
+                                "{{gateway_url}}"
+                            ],
+                            "path": [
+                                "flota",
+                                "transportistas"
+                            ]
+                        },
+                        "description": "Registra un nuevo transportista en el sistema (ADMIN)"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "[ADMIN] Actualizar Transportista",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"nombre\": \"Juan\",\n  \"apellido\": \"Perez\",\n  \"dni\": \"12345678\",\n  \"email\": \"juan.perez@example.com\",\n  \"telefono\": \"+541198765432\",\n  \"numeroLicencia\": \"B1234567\",\n  \"categoriaLicencia\": \"C\",\n  \"activo\": true\n}"
+                        },
+                        "url": {
+                            "raw": "{{gateway_url}}/flota/transportistas/{{transportista_id}}",
+                            "host": [
+                                "{{gateway_url}}"
+                            ],
+                            "path": [
+                                "flota",
+                                "transportistas",
+                                "{{transportista_id}}"
+                            ]
+                        },
+                        "description": "Actualiza los datos de un transportista existente (ADMIN)"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "[ADMIN] Desactivar Transportista",
+                    "request": {
+                        "method": "PUT",
+                        "header": [],
+                        "url": {
+                            "raw": "{{gateway_url}}/flota/transportistas/{{transportista_id}}/desactivar",
+                            "host": [
+                                "{{gateway_url}}"
+                            ],
+                            "path": [
+                                "flota",
+                                "transportistas",
+                                "{{transportista_id}}",
+                                "desactivar"
+                            ]
+                        },
+                        "description": "Marca un transportista como inactivo (soft delete) - (ADMIN)"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "[ADMIN] Activar Transportista",
+                    "request": {
+                        "method": "PUT",
+                        "header": [],
+                        "url": {
+                            "raw": "{{gateway_url}}/flota/transportistas/{{transportista_id}}/activar",
+                            "host": [
+                                "{{gateway_url}}"
+                            ],
+                            "path": [
+                                "flota",
+                                "transportistas",
+                                "{{transportista_id}}",
+                                "activar"
+                            ]
+                        },
+                        "description": "Marca un transportista como activo (ADMIN)"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "[ADMIN] Eliminar Transportista",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [],
+                        "url": {
+                            "raw": "{{gateway_url}}/flota/transportistas/{{transportista_id}}",
+                            "host": [
+                                "{{gateway_url}}"
+                            ],
+                            "path": [
+                                "flota",
+                                "transportistas",
+                                "{{transportista_id}}"
+                            ]
+                        },
+                        "description": "Elimina físicamente un transportista del sistema. Solo se pueden eliminar transportistas sin camiones asignados (ADMIN)"
                     },
                     "response": []
                 }
