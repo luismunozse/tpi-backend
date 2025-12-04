@@ -14,8 +14,8 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: ${KEYCLOAK_ISSUER_URI:http://keycloak:8080/realms/tpi-backend}
-          jwk-set-uri: ${KEYCLOAK_JWK_SET_URI:http://keycloak:8080/realms/tpi-backend/protocol/openid-connect/certs}
+          issuer-uri: ${KEYCLOAK_ISSUER_URI:http://host.docker.internal:9090/realms/tpi-backend}
+          jwk-set-uri: ${KEYCLOAK_JWK_SET_URI:http://host.docker.internal:9090/realms/tpi-backend/protocol/openid-connect/certs}
 
 logging:
   level:
@@ -30,14 +30,6 @@ management:
   endpoint:
     health:
       show-details: always
-
-keycloak:
-  admin:
-    url: ${KEYCLOAK_ADMIN_URL:http://keycloak:8080}
-    realm: ${KEYCLOAK_ADMIN_REALM:tpi-backend}
-    username: ${KEYCLOAK_ADMIN_USER:admin}
-    password: ${KEYCLOAK_ADMIN_PASSWORD:admin123}
-    default-user-password: ${KEYCLOAK_DEFAULT_USER_PASSWORD:Temporal123!}
 
 tpi:
   gateway:

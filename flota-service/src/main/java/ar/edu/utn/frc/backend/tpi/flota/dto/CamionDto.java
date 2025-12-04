@@ -11,28 +11,25 @@ import lombok.Data;
 public class CamionDto {
     private Long id;
 
-    @NotBlank(message = "El dominio es obligatorio")
+    @NotBlank
     private String dominio;
 
-    // Relación con Transportista
-    @NotNull(message = "El transportista es obligatorio")
-    private Long transportistaId;
-
-    // Información del transportista (solo para lectura)
+    @NotBlank
     private String nombreTransportista;
-    private String apellidoTransportista;
-    private String telefonoTransportista;
 
-    @NotNull(message = "La capacidad de peso es obligatoria")
+    @NotBlank
+    private String telefono;
+
+    @NotNull
     private Double capacidadPesoKg;
 
-    @NotNull(message = "La capacidad de volumen es obligatoria")
+    @NotNull
     private Double capacidadVolumenM3;
 
-    @NotNull(message = "El consumo de combustible es obligatorio")
+    @NotNull
     private Double consumoCombustibleLitrosKm;
 
-    @NotNull(message = "El costo base por km es obligatorio")
+    @NotNull
     private Double costoBaseKm;
 
     private EstadoCamion estado;

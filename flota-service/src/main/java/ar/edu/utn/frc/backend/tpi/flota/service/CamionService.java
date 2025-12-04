@@ -10,9 +10,7 @@ import ar.edu.utn.frc.backend.tpi.flota.dto.AsignacionCamionRequest;
 import ar.edu.utn.frc.backend.tpi.flota.mapper.CamionMapper;
 import ar.edu.utn.frc.backend.tpi.flota.model.Camion;
 import ar.edu.utn.frc.backend.tpi.flota.model.EstadoCamion;
-import ar.edu.utn.frc.backend.tpi.flota.model.Transportista;
 import ar.edu.utn.frc.backend.tpi.flota.repository.CamionRepository;
-import ar.edu.utn.frc.backend.tpi.flota.repository.TransportistaRepository;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -20,22 +18,10 @@ import lombok.RequiredArgsConstructor;
 public class CamionService {
 
     private final CamionRepository camionRepository;
-    private final TransportistaRepository transportistaRepository;
 
     @Transactional
     public CamionDto crear(CamionDto dto) {
-        // Buscar el transportista
-        Transportista transportista = transportistaRepository.findById(dto.getTransportistaId())
-                .orElseThrow(() -> new IllegalArgumentException(
-                        "Transportista no encontrado con id " + dto.getTransportistaId()));
-
-        // Validar que el transportista esté activo
-        if (!transportista.getActivo()) {
-            throw new IllegalStateException(
-                    "No se puede asignar un transportista inactivo al camión");
-        }
-
-        Camion camion = CamionMapper.toEntity(dto, transportista);
+        Camion camion = CamionMapper.toEntity(dto);
         camion.setEstado(camion.getEstado() != null ? camion.getEstado() : EstadoCamion.DISPONIBLE);
         return CamionMapper.toDto(camionRepository.save(camion));
     }
@@ -71,22 +57,9 @@ public class CamionService {
         Camion camion = camionRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Camion no encontrado con id " + id));
 
-        // Si se proporciona un nuevo transportista, buscarlo y validar
-        if (dto.getTransportistaId() != null) {
-            Transportista transportista = transportistaRepository.findById(dto.getTransportistaId())
-                    .orElseThrow(() -> new IllegalArgumentException(
-                            "Transportista no encontrado con id " + dto.getTransportistaId()));
-
-            // Validar que el transportista esté activo
-            if (!transportista.getActivo()) {
-                throw new IllegalStateException(
-                        "No se puede asignar un transportista inactivo al camión");
-            }
-
-            camion.setTransportista(transportista);
-        }
-
         camion.setDominio(dto.getDominio());
+        camion.setNombreTransportista(dto.getNombreTransportista());
+        camion.setTelefono(dto.getTelefono());
         camion.setCapacidadPesoKg(dto.getCapacidadPesoKg());
         camion.setCapacidadVolumenM3(dto.getCapacidadVolumenM3());
         camion.setConsumoCombustibleLitrosKm(dto.getConsumoCombustibleLitrosKm());

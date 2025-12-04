@@ -35,7 +35,6 @@ public class SecurityConfig {
                         // Endpoints públicos
                         .pathMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .pathMatchers("/actuator/health", "/actuator/info").permitAll()
-                        .pathMatchers("/internal/**").permitAll()
 
                         // Tramos: TRANSPORTISTA puede consultar (GET) y registrar inicio/fin (POST)
                         .pathMatchers(HttpMethod.GET, "/solicitudes/tramos/**")

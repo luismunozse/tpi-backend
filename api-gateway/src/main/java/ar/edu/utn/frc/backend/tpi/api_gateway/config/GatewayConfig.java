@@ -37,11 +37,10 @@ public class GatewayConfig {
                         .filters(f -> f.rewritePath("/rutas(?<segment>/.*)?", "/api/rutas${segment}"))
                         .uri(solicitudesUrl))
                 .route("flota-service", r -> r
-                        .path("/flota/camiones/**", "/flota/depositos/**", "/flota/transportistas/**")
+                        .path("/flota/camiones/**", "/flota/depositos/**")
                         .filters(f -> f
                                 .rewritePath("/flota/camiones(?<segment>/.*)?", "/api/camiones${segment}")
                                 .rewritePath("/flota/depositos(?<segment>/.*)?", "/api/depositos${segment}")
-                                .rewritePath("/flota/transportistas(?<segment>/.*)?", "/api/transportistas${segment}")
                         )
                         .uri(flotaUrl))
                 .route("costos-service", r -> r

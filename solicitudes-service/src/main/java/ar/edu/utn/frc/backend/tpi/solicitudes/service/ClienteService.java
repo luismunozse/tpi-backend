@@ -28,7 +28,6 @@ import lombok.extern.slf4j.Slf4j;
 public class ClienteService {
 
     private final ClienteRepository clienteRepository;
-    private final GatewayKeycloakClient gatewayKeycloakClient;
 
     /**
      * Crear un nuevo cliente.
@@ -50,8 +49,6 @@ public class ClienteService {
 
         Cliente cliente = ClienteMapper.toEntity(request);
         Cliente clienteGuardado = clienteRepository.save(cliente);
-        // Solicitar aprovisionamiento en Keycloak a través del gateway (no interrumpe si falla)
-        gatewayKeycloakClient.ensureClientUser(request.getNombre(), request.getEmail());
 
         log.info("Cliente creado con id: {}", clienteGuardado.getId());
         return ClienteMapper.toResponse(clienteGuardado);

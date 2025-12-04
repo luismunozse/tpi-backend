@@ -1,6 +1,13 @@
 package ar.edu.utn.frc.backend.tpi.flota.model;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -21,30 +28,22 @@ public class Camion {
     @Column(nullable = false, unique = true)
     private String dominio; // patente o identificador
 
-    // Relación con Transportista (reemplaza a nombreTransportista y telefono)
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "transportista_id")
-    private Transportista transportista;
-
-    // Campos legacy para compatibilidad (deprecated)
-    @Deprecated
-    @Column(name = "nombre_transportista")
+    @Column(nullable = false)
     private String nombreTransportista;
 
-    @Deprecated
-    @Column(name = "telefono")
+    @Column(nullable = false)
     private String telefono;
 
-    @Column(name = "capacidad_peso_kg", nullable = false)
+    @Column(nullable = false)
     private Double capacidadPesoKg;
 
-    @Column(name = "capacidad_volumen_m3", nullable = false)
+    @Column(nullable = false)
     private Double capacidadVolumenM3;
 
-    @Column(name = "consumo_combustible_litros_km", nullable = false)
+    @Column(nullable = false)
     private Double consumoCombustibleLitrosKm;
 
-    @Column(name = "costo_base_km", nullable = false)
+    @Column(nullable = false)
     private Double costoBaseKm;
 
     @Enumerated(EnumType.STRING)
